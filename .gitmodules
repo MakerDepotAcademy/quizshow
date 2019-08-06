@@ -1,0 +1,3 @@
+[submodule "gpio32"]
+	path = gpio32
+	url = git@github.com:BradTotaro/gpio32.git
