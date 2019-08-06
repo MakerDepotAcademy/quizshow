@@ -13,6 +13,7 @@ function updateUI(channel, msg, res) {
   if (win) {
     win.webContents.send(channel, msg);
     res && res.status(200).send('Display updated')
+    console.log('Updated UI', channel, msg)
     return true;
   }
   else {
@@ -53,6 +54,7 @@ api.delete('/', (req, res) => {
 })
 
 api.post('/question', (req, res) => {
+  console.log(req, res)
   updateUI('question', req.body, res)
 })
 
