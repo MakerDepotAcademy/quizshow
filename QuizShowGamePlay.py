@@ -2,9 +2,12 @@ import datetime
 from sqlalchemy import create_engine
 import time
 from threading import Thread, Event
+from display import Display
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
+
+D = Display('localhost:3000')
 
 # Ask Questions
 def AskQuestions():
@@ -40,6 +43,13 @@ def AskQuestions():
             print("blue: ", row['blue'])
             print("correct_answer: ", row['correct_answer'])
 
+            D.setAnswer('a', row['red'])
+            D.setAnswer('b', row['green'])
+            D.setAnswer('c', row['yellow'])
+            D.setAnswer('d', row['blue'])
+            D.setQuestion(row['question'])
+            D.start()
+
             # Send question to the board and wait for answer
             ans = input(row['question'])
             if ans != row['correct_answer']:
@@ -48,6 +58,7 @@ def AskQuestions():
             else:
                 print("Correct Answer")
                 score = score + 1
+            D.setScore(score)
 
             if stopGameEvent.is_set():
                 AskQuestions = score
