@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>666</width>
+    <height>476</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QGridLayout" name="screenLeftGridLayout"/>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="formGridLayout" rowstretch="0,0,0">
+     <item row="2" column="0">
+      <layout class="QGridLayout" name="senterGridLayout" rowstretch="2,2,2,1">
+       <item row="0" column="0">
+        <widget class="QLabel" name="questionLabel">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(111, 255, 218);
+font: 32pt &quot;.SF NS Text&quot;;
+border-width: 1px;
+border-style: solid;
+border-radius: 50px;</string>
+         </property>
+         <property name="text">
+          <string>When a pirate yells, 'Avast, ye mateys' he is telling his mates to do what?</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="Line" name="bottomLine">
+         <property name="sizeIncrement">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <layout class="QGridLayout" name="bottomGridLayout" rowstretch="0">
+         <item row="0" column="5">
+          <widget class="QLabel" name="timeValueLabel">
+           <property name="text">
+            <string>00:00</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="scoreLabel">
+           <property name="text">
+            <string>Score</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="scoreValueLabel">
+           <property name="text">
+            <string>000</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="timeLabel">
+           <property name="text">
+            <string>Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="2">
+          <widget class="QQuickWidget" name="quickWidget" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <layout class="QGridLayout" name="answersGridLayout" rowstretch="0,0">
+         <item row="0" column="0">
+          <widget class="QLabel" name="yellowAnswerLabel">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 10);
+font: 32pt &quot;.SF NS Text&quot;;
+border-width: 1px;
+border-style: solid;
+border-radius: 20px;</string>
+           </property>
+           <property name="text">
+            <string>Stop</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="redAnswerLabel">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(252, 1, 7);
+font: 32pt &quot;.SF NS Text&quot;;
+border-width: 1px;
+border-style: solid;
+border-radius: 20px;</string>
+           </property>
+           <property name="text">
+            <string>Drink</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="greenAnswerLabel">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(33, 255, 6);
+font: 32pt &quot;.SF NS Text&quot;;
+border-width: 1px;
+border-style: solid;
+border-radius: 20px;</string>
+           </property>
+           <property name="text">
+            <string>Fight</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="blueAnswerLabel">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(0, 0, 255);
+font: 32pt &quot;.SF NS Text&quot;;
+border-width: 1px;
+border-style: solid;
+border-radius: 20px;</string>
+           </property>
+           <property name="text">
+            <string>Run</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="screenRightGridLayout"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
