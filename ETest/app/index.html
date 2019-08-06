@@ -1,0 +1,36 @@
+<head>
+  <link rel="stylesheet" href="style.css" >
+</head>
+
+<body>
+  <video autoplay></video>
+  <header>
+    <h1>Quiz show</h1>
+  </header>
+
+  <br /> <br /> <br />
+
+  <h2 id="question"></h2>
+
+  <h1 id="roundsup" class="hidden alert">Round's up</h1>
+  <h1 id="gameover" class="hidden alert">Game over</h1>
+  
+  <div class="container">
+    <div id="a" class="box"><span class="label">A:</span>&nbsp;<span id="answer"></span></div>
+    <div id="b" class="box"><span class="label">B:</span>&nbsp;<span id="answer"></span></div>
+    <div id="c" class="box"><span class="label">C:</span>&nbsp;<span id="answer"></span></div>
+    <div id="d" class="box"><span class="label">D:</span>&nbsp;<span id="answer"></span></div>
+  </div>
+
+  <footer>
+    <div class="right">
+      <h3>Score: <span id="score"></span></h3>
+    </div>
+    <div class="left">
+      <h3>Round time: <span id="round_time" class="timer"></span></h3>
+      <h3>Game time: <span id="game_time" class="timer"></span></h3>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
