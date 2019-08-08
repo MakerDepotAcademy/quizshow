@@ -22,8 +22,11 @@ class Board():
     while True:
       line = self._ser.readline()
 
+      if len(line) == 0:
+        continue
+
       if len(line) != 34:
-        self._ser.seek(-len(line))
+        self._ser.seek(len(line), 2)
         continue
 
       if last == line:
@@ -72,6 +75,9 @@ class Board():
     if not self._eventAlive:
       self._eventThread.start()
       self._eventAlive = True
+
+  def clearHooks(self):
+    self._hooks = []
 
 class Manager():
   
