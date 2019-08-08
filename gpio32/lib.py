@@ -78,7 +78,7 @@ class Manager():
   def __init__(self):
     # ls /dev/ttyACM*
     self._boards = {}
-    for acm in Path('/dev').glob('**/ttyACM*'):
+    for acm in Path('/dev').glob('ttyACM*'):
       b = None
       try:
         b = Board(acm)
