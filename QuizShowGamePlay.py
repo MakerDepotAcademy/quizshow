@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import create_engine
 import time
-from threading import Thread, Event
+from threading import Thread, Event, Lock
 from display import Display
 from gpio32.lib import Manager
 
@@ -10,6 +10,20 @@ stopGameEvent = Event()
 
 D = Display('localhost:8080')
 Boards = Manager()
+
+
+# a=Boards['65535']
+
+def terst(a,b):
+    print (a)
+    print (b)
+    print("ohohoho")
+
+
+#a.onChange(terst,1)
+
+#while (1):
+#    time.sleep(1)
 
 class Button():
 
@@ -30,6 +44,9 @@ class Button():
     def read(self):
         return self._board.readPin(self._in)
 
+    def clearHooks(self):
+        self._board.clearHooks()
+
 class Player():
 
     def __init__(self, board, bot, top):
@@ -47,28 +64,41 @@ class Player():
         return self.buttons[x]
 
     def catchAnswer(self):
+        print(self.buttons['a']._in)
+        print(self.buttons['b']._in)
+        print(self.buttons['c']._in)
+        print(self.buttons['d']._in)
+
+        lock = Lock()
+        global ans
         ans = ''
-        def a(pin, val):
-            ans = 'a'
-        def b(pin, val):
-            ans = 'b'
-        def c(pin, val):
-            ans = 'c'
-        def d(pin, val):
-            ans = 'd'
+        lock.acquire(True)
 
-        self.buttons['a'].hook(a)
-        self.buttons['b'].hook(b)
-        self.buttons['c'].hook(c)
-        self.buttons['d'].hook(d)
+        def hooker(pin, val):
+            global ans
+            
+            try:
+                for c in 'abcd':
+                    ans = c if self.buttons[c]._in == pin else ans
+            finally:
+                lock.release()
 
-        self._board._eventThread.join()
+        self.buttons['a'].hook(hooker)
+        self.buttons['b'].hook(hooker)
+        self.buttons['c'].hook(hooker)
+        self.buttons['d'].hook(hooker)
+        
+
+        lock.acquire(True)
+        self.buttons['a'].clearHooks()
+        lock.release()
+        
         return ans
 
 Players = {
-    'a': Player(Boards['65535'], 0, 8),
-    'b': Player(Boards['65535'], 9, 18),
-    'c': Player(Boards['65535'], 18, 27) # ,
+    'a': Player(Boards['12592'], 1, 9),
+    'b': Player(Boards['12592'], 9, 18),
+    'c': Player(Boards['12592'], 18, 26) # ,
     # 'd': Player(Boards['1'], 0, 8),
     # 'e': Player(Boards['1'], 9, 18)
 }
@@ -84,11 +114,12 @@ def AskQuestions():
         i = 0
         while True:
             i += 1
-            if i > len(Players.keys()):
+            if i >= len(Players.keys()):
                 i = 0
             yield Players[Players.keys()[i]]
             
     GP = getPlayer()
+    print (GP)
              
     while (1):
         # Ask question and verify answer
@@ -121,7 +152,7 @@ def AskQuestions():
             print("correct_answer: ", row['correct_answer'])
 
             thisPlayer.lightAll()
-            time.sleep(3)
+            # time.sleep(3)
             thisPlayer.lightAll(False)
 
             D.setQuestion(row['question'])
@@ -133,6 +164,7 @@ def AskQuestions():
             D.start()
 
             # Send question to the board and wait for answer
+            print ("oh ok im here")
             ans = thisPlayer.catchAnswer()
             if ans != row['correct_answer']:
                 print("Wrong")
@@ -164,7 +196,7 @@ questionThread = Thread(target=AskQuestions)
 
 # Here we start the thread and we wait 330 seconds before the code continues to execute.
 questionThread.start()
-score = questionThread.join(timeout=330)
+score = questionThread.join(timeout=630)
 if (isinstance(score, int) == False):
     score = 0
 
