@@ -4,26 +4,15 @@ import time
 from threading import Thread, Event, Lock
 from display import Display
 from gpio32.lib import Manager
+from flask import Flask, request
+
+
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
-
 D = Display('localhost:8080')
 Boards = Manager()
-
-
-# a=Boards['65535']
-
-def terst(a,b):
-    print (a)
-    print (b)
-    print("ohohoho")
-
-
-#a.onChange(terst,1)
-
-#while (1):
-#    time.sleep(1)
+api = Flask(__name__)
 
 class Button():
 
@@ -49,11 +38,8 @@ class Button():
 
 class Player():
 
-    def __init__(self, board, bot, top):
-        if (top - bot) / 2 != 4:
-            raise Exception('Range must be 8 pins long')
-
-        self.buttons = { l: Button(board, i, i + 1) for l, i in zip( ['a', 'b', 'c', 'd'], range(bot, top, 2) ) }
+    def __init__(self, board, top):
+        self.buttons = { l: Button(board, i, i + 1) for l, i in zip( 'abcd', range(bot, bot + 8, 2) ) }
         self._board = board
 
     def lightAll(self, on=True):
@@ -95,16 +81,8 @@ class Player():
         
         return ans
 
-Players = {
-    'a': Player(Boards['12592'], 1, 9),
-    'b': Player(Boards['12592'], 9, 18),
-    'c': Player(Boards['12592'], 18, 26) # ,
-    # 'd': Player(Boards['1'], 0, 8),
-    # 'e': Player(Boards['1'], 9, 18)
-}
-
 # Ask Questions
-def AskQuestions():
+def AskQuestions(Players):
     score = 0
     dbConnect = create_engine('sqlite:///quizShow.db')
 
@@ -192,10 +170,30 @@ score = 0
 
 # Start Game loop
 # Create Question thread
-questionThread = Thread(target=AskQuestions)
+questionThread = None
 
 # Here we start the thread and we wait 330 seconds before the code continues to execute.
-questionThread.start()
+@api.route('/')
+def start():
+    player_count = int(request.form['playerCount'])
+    boards_ = [Boards['12592'], Boards['1']]
+
+    Players = {}
+    b = B = 0
+    for c in [chr(i) for i in range(97, 97 + player_count)]:
+        if b > 2:
+            b = 0
+            B += 1
+        else:
+            b += 1
+
+        Players[c] = Player(Boards[B], (B * 8) + 1)
+
+    questionThread = Thread(target=AskQuestions, args=[Players])
+    questionThread.start()
+    return 'ok'
+
+api.run()
 score = questionThread.join(timeout=630)
 if (isinstance(score, int) == False):
     score = 0
