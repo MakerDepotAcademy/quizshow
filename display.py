@@ -37,3 +37,9 @@ class Display():
 
     def start(self):
         self._post('start', '3')
+
+    def setRoundTimer(self, secs):
+        self._post('timer/round', secs)
+    
+    def setGameTimer(self, secs):
+        self._post('timer/game', secs)
