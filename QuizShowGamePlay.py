@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import create_engine
 import time
-from threading import Thread, Event, Lock
+from threading import Thread, Event, Lock, Timer
 from display import Display
 from gpio32.lib import Manager
 from flask import Flask, request
@@ -11,6 +11,8 @@ from flask import Flask, request
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
 D = Display('localhost:8080')
+ROUNDTIME = 10
+D.setGameTimer(ROUNDTIME * 6)
 Boards = Manager()
 api = Flask(__name__)
 
@@ -73,8 +75,12 @@ class Player():
         self.buttons['b'].hook(hooker)
         self.buttons['c'].hook(hooker)
         self.buttons['d'].hook(hooker)
-        
 
+        def timeout():
+            return lock.release()
+        
+        t = Timer(ROUNDTIME, timeout)
+        t.start()
         lock.acquire(True)
         self.buttons['a'].clearHooks()
         lock.release()
@@ -87,7 +93,7 @@ def AskQuestions(player_count):
     dbConnect = create_engine('sqlite:///quizShow.db')
     dbConnection = dbConnect.connect()
 
-    boards_ = [Boards['65535']]
+    boards_ = [Boards['65535'], Boards['25954']]
     Players = {}
     b = B = 0
     for c in [chr(i) for i in range(97, 97 + player_count)]:
@@ -148,7 +154,7 @@ def AskQuestions(player_count):
             D.setAnswer('b', row['green'])
             D.setAnswer('c', row['yellow'])
             D.setAnswer('d', row['blue'])
-            
+            D.setRoundTimer(ROUNDTIME)
             D.start()
 
             # Send question to the board and wait for answer

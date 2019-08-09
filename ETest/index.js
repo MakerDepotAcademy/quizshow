@@ -6,7 +6,7 @@ const request = require('request')
 var bodyParser = require('body-parser')
 var api = require('express')()
 var win
-var score = 0, roundTicksLimit = roundTicks = parseInt(process.env.ROUND_SECONDS), gameTicksLimit = gameTicks = parseInt(process.env.GAME_SECONDS), roundTicker, gameTicker
+var score = 0, roundTicksLimit = roundTicks = -1, gameTicksLimit = gameTicks = -1, roundTicker, gameTicker
 GameEvents = new EventEmitter()
 
 function updateUI(channel, msg, res) {
@@ -30,14 +30,14 @@ api.use((req, res, next) => {
   next()
 })
 
-api.use((req, res, next) => {
-  if (gameTicks < 1) {
-    res.status(401).send('Game over')
-  }
-  else {
-    next()
-  }
-})
+// api.use((req, res, next) => {
+//   if (gameTicks < 1) {
+//     res.status(401).send('Game over')
+//   }
+//   else {
+//     next()
+//   }
+// })
 
 api.get('/', (req, res) => {
   if (win) {
@@ -63,6 +63,9 @@ api.post('/answer/:label', (req, res) => {
 })
 
 api.post('/start', (req, res) => {
+  if (roundTicksLimit == -1 || gameTicksLimit == -1) {
+    res.status(400).send('Times not set')
+  }
   roundTicker = setInterval(() => {
     updateUI('roundtick', roundTicks)
     if (roundTicks-- < 1) {
@@ -125,6 +128,16 @@ api.post('/score/dec', parseIntBody, (req, res, next) => {
 
 api.get('/score', (req, res) => {
   res.status(200).send("" + score)
+})
+
+api.post('/timer/round', parseIntBody, (req, res) => {
+  roundTicks = roundTicksLimit = req.body
+  res.send('ok')
+})
+
+api.post('/timer/game', parseIntBody, (req, res) => {
+  gameTicks = gameTicksLimit = req.body
+  res.send('ok')
 })
 
 ipcMain.once('videoended', (evt, arg) => {
