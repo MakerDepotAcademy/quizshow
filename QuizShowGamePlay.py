@@ -5,16 +5,36 @@ from threading import Thread, Event, Lock, Timer
 from display import Display
 from gpio32.lib import Manager
 from flask import Flask, request
-
+import configparser
 
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
 D = Display('localhost:8080')
-ROUNDTIME = 10
-D.setGameTimer(ROUNDTIME * 6)
 Boards = Manager()
 api = Flask(__name__)
+
+class Config():
+
+    def __init__(self):
+        self._config = configparser.ConfigParser()
+        self._config.read('config.cfg')
+
+        sec = self._config['DEFAULT']
+        self.RoundTime = int(sec['ROUND_TIME'])
+        self.GameTime = int(sec['GAME_TIME'])
+        self.BoardStack = sec['BOARD_STACK'].split(',')
+        self.IncScore = int(sec['INC_SCORE'])
+        self.DecScore = int(sec['DEC_SCORE'])
+        self.InitScore = int(sec['INIT_SCORE'])
+        self.DB_URL = sec['DB_URL']
+        self.InviteSleep = int(sec['INVITE_SLEEP'])
+        self.BoardPlayerLimit = int(sec['BOARD_PLAYER_LIMIT'])
+
+
+C = Config()
+
+D.setGameTimer(C.GameTime)
 
 class Button():
 
@@ -79,7 +99,7 @@ class Player():
         def timeout():
             return lock.release()
         
-        t = Timer(ROUNDTIME, timeout)
+        t = Timer(C.RoundTime, timeout)
         t.start()
         lock.acquire(True)
         self.buttons['a'].clearHooks()
@@ -89,16 +109,16 @@ class Player():
 
 # Ask Questions
 def AskQuestions(player_count):
-    score = 0
-    dbConnect = create_engine('sqlite:///quizShow.db')
+    score = C.InitScore
+    dbConnect = create_engine(C.DB_URL)
     dbConnection = dbConnect.connect()
 
-    boards_ = [Boards['65535'], Boards['25954']]
+    boards_ = [Boards[i] for i in C.BoardStack]
     Players = {}
     b = B = 0
     for c in [chr(i) for i in range(97, 97 + player_count)]:
         Players[c] = Player(boards_[B], (b * 8) + 1)
-        if b > 2:
+        if b > C.BoardPlayerLimit - 1:
             b = 0
             B += 1
         else:
@@ -146,7 +166,7 @@ def AskQuestions(player_count):
             print("correct_answer: ", row['correct_answer'])
 
             thisPlayer.lightAll()
-            # time.sleep(3)
+            time.sleep(C.InviteSleep)
             thisPlayer.lightAll(False)
 
             D.setQuestion(row['question'])
@@ -162,11 +182,11 @@ def AskQuestions(player_count):
             ans = thisPlayer.catchAnswer()
             if ans != row['correct_answer']:
                 print("Wrong")
-                score = score - 1
+                score = score - C.DecScore
             else:
                 print("Correct Answer")
                 D.setCorrect(ans)
-                score = score + 1
+                score = score + C.IncScore
             D.setScore(score)
 
             if stopGameEvent.is_set():
@@ -182,7 +202,7 @@ def AskQuestions(player_count):
 #--------------------------------------------------------------------------------
 #- The Quiz Show Game
 #--------------------------------------------------------------------------------
-score = 0
+score = C.InitScore
 
 # Start Game loop
 # Create Question thread
@@ -200,7 +220,7 @@ def start():
 api.run()
 score = questionThread.join(timeout=630)
 if (isinstance(score, int) == False):
-    score = 0
+    score = score = C.InitScore
 
 # We send a signal that the other thread should stop.
 stopGameEvent.set()
