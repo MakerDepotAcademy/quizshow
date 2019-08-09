@@ -110,14 +110,17 @@ const scoreChanged = (req, res, next) => {
 
 api.post('/score', parseIntBody, (req, res, next) => {
   score = req.body
+  next()
 }, scoreChanged)
 
 api.post('/score/inc', parseIntBody, (req, res, next) => {
   score += req.body
+  next()
 }, scoreChanged)
 
 api.post('/score/dec', parseIntBody, (req, res, next) => {
   score -= req.body
+  next()
 }, scoreChanged)
 
 api.get('/score', (req, res) => {
