@@ -38,7 +38,7 @@ class Button():
 
 class Player():
 
-    def __init__(self, board, top):
+    def __init__(self, board, bot):
         self.buttons = { l: Button(board, i, i + 1) for l, i in zip( 'abcd', range(bot, bot + 8, 2) ) }
         self._board = board
 
@@ -82,11 +82,21 @@ class Player():
         return ans
 
 # Ask Questions
-def AskQuestions(Players):
+def AskQuestions(player_count):
     score = 0
     dbConnect = create_engine('sqlite:///quizShow.db')
-
     dbConnection = dbConnect.connect()
+
+    boards_ = [Boards['65535']]
+    Players = {}
+    b = B = 0
+    for c in [chr(i) for i in range(97, 97 + player_count)]:
+        Players[c] = Player(boards_[B], (b * 8) + 1)
+        if b > 2:
+            b = 0
+            B += 1
+        else:
+            b += 1
 
     def getPlayer():
         i = 0
@@ -176,20 +186,8 @@ questionThread = None
 @api.route('/')
 def start():
     player_count = int(request.form['playerCount'])
-    boards_ = [Boards['12592'], Boards['1']]
-
-    Players = {}
-    b = B = 0
-    for c in [chr(i) for i in range(97, 97 + player_count)]:
-        if b > 2:
-            b = 0
-            B += 1
-        else:
-            b += 1
-
-        Players[c] = Player(Boards[B], (B * 8) + 1)
-
-    questionThread = Thread(target=AskQuestions, args=[Players])
+    
+    questionThread = Thread(target=AskQuestions, args=[player_count])
     questionThread.start()
     return 'ok'
 
