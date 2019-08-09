@@ -6,7 +6,8 @@ from display import Display
 from gpio32.lib import Manager
 from flask import Flask, request
 import configparser
-
+import json
+import inspect
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
@@ -14,7 +15,7 @@ D = Display('localhost:8080')
 Boards = Manager()
 api = Flask(__name__)
 
-class Config():
+class Config(object):
 
     def __init__(self):
         self._config = configparser.ConfigParser()
@@ -164,6 +165,13 @@ def AskQuestions(player_count):
             print("red: ", row['red'])
             print("blue: ", row['blue'])
             print("correct_answer: ", row['correct_answer'])
+            C.RowID = row['rowid']
+            C.Question = row['Question']
+            C.Ans_Yellow = row['yellow']
+            C.Ans_Green = row['green']
+            C.Ans_Red = row['red']
+            C.Ans_Blue = row['blue']
+            C.Ans_Correct = row['correct_answer']
 
             thisPlayer.lightAll()
             time.sleep(C.InviteSleep)
@@ -188,6 +196,7 @@ def AskQuestions(player_count):
                 D.setCorrect(ans)
                 score = score + C.IncScore
             D.setScore(score)
+            C.Score = score
 
             if stopGameEvent.is_set():
                 AskQuestions = score
@@ -209,13 +218,26 @@ score = C.InitScore
 questionThread = None
 
 # Here we start the thread and we wait 330 seconds before the code continues to execute.
-@api.route('/')
+@api.route('/', methods=['POST'])
 def start():
     player_count = int(request.form['playerCount'])
+    C.PlayerCount = player_count
     
     questionThread = Thread(target=AskQuestions, args=[player_count])
     questionThread.start()
     return 'ok'
+
+@api.route('/', methods=['GET'])
+def get():
+    def props(obj):
+        pr = {}
+        for name in dir(obj):
+            value = getattr(obj, name)
+            if not name.startswith('_') and not inspect.ismethod(value):
+                pr[name] = value
+        return pr
+    t = props(C)
+    return json.dumps(t)
 
 api.run()
 score = questionThread.join(timeout=630)
