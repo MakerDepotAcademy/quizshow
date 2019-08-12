@@ -11,7 +11,6 @@ import inspect
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
-D = Display('localhost:8080')
 Boards = Manager()
 api = Flask(__name__)
 
@@ -31,10 +30,12 @@ class Config(object):
         self.DB_URL = sec['DB_URL']
         self.InviteSleep = int(sec['INVITE_SLEEP'])
         self.BoardPlayerLimit = int(sec['BOARD_PLAYER_LIMIT'])
+        self.Display_Host = sec['DISP_HOST']
 
 
 C = Config()
 
+D = Display(C.Display_Host)
 D.setGameTimer(C.GameTime)
 
 class Button():
