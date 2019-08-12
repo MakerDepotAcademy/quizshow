@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+
 import datetime
 from sqlalchemy import create_engine
 import time
@@ -127,7 +129,7 @@ def AskQuestions(player_count):
     b = B = 0
     for c in [chr(i) for i in range(97, 97 + player_count)]:
         Players[c] = Player(boards_[B], (b * 8) + 1)
-        if b > C.BoardPlayerLimit - 1:
+        if b >= C.BoardPlayerLimit:
             b = 0
             B += 1
         else:
