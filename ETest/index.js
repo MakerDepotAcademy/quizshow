@@ -3,6 +3,7 @@ require('dotenv').config()
 const { app, BrowserWindow, ipcMain } = require('electron')
 const EventEmitter = require('events')
 const request = require('request')
+const fs = require('fs')
 var bodyParser = require('body-parser')
 var api = require('express')()
 var win
@@ -152,9 +153,23 @@ api.post('/wrong', (req, res) => {
   updateUI('wrong', '', res)
 })
 
-ipcMain.once('videoended', (evt, arg) => {
-  GameEvents.emit('videoended')
+api.post('/video/play/:name', (req, res) => {
+  updateUI('videoplay', process.env.VIDEO_LIB + '/' + req.params.name)
+  ipcMain.once('videodone', () => {
+    res.send('done')
+  })
 })
+
+api.post('/audio/play/:name', (req, res) => {
+  updateUI('audioplay', process.env.AUDIO_LIB + '/' + req.params.name)
+  ipcMain.once('audiodone', () => {
+    res.send('Done')
+  })
+})
+
+// ipcMain.once('videoended', (evt, arg) => {
+//   GameEvents.emit('videoended')
+// })
 
 app.on('ready', () => {
   // Create the browser window.
