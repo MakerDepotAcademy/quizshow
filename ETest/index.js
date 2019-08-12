@@ -65,6 +65,7 @@ api.post('/answer/:label', (req, res) => {
 api.post('/start', (req, res) => {
   if (roundTicksLimit == -1 || gameTicksLimit == -1) {
     res.status(400).send('Times not set')
+    return
   }
   roundTicker = setInterval(() => {
     updateUI('roundtick', roundTicks)
@@ -81,6 +82,7 @@ api.post('/start', (req, res) => {
       updateUI('gametick', gameTicks)
       if (gameTicks-- < 1) {
         updateUI('gameover', '')
+        clearInterval(gameTicker)
         GameEvents.emit('gameover')
       }
     }, 1000)
@@ -100,6 +102,10 @@ api.post('/answer/:label/correct', (req, res) => {
   clearInterval(roundTicker)
   updateUI(req.params.label + 'correct', 'CORRECT', res)
 })
+
+api.post('/answer/:label/selected', (req, res) => {
+  updateUI(req.params.label + 'selected', '', res)
+3})
 
 const parseIntBody = (req, res, next) => {
   req.body = parseInt(req.body)
@@ -131,13 +137,19 @@ api.get('/score', (req, res) => {
 })
 
 api.post('/timer/round', parseIntBody, (req, res) => {
+  clearInterval(roundTicker)
   roundTicks = roundTicksLimit = req.body
   res.send('ok')
 })
 
 api.post('/timer/game', parseIntBody, (req, res) => {
+  clearInterval(gameTicker)
   gameTicks = gameTicksLimit = req.body
   res.send('ok')
+})
+
+api.post('/wrong', (req, res) => {
+  updateUI('wrong', '', res)
 })
 
 ipcMain.once('videoended', (evt, arg) => {

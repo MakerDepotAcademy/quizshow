@@ -26,16 +26,16 @@
   text-align: center;
 }
 
-.container .box#a {
+.container .box#red {
   background-color: red;
 }
-.container .box#b {
+.container .box#green {
   background-color: green;
 }
-.container .box#c {
+.container .box#blue {
   background-color: blue;
 }
-.container .box#d {
+.container .box#yellow {
   background-color: yellow;
 }
 
