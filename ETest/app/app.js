@@ -50,11 +50,27 @@ ipcRenderer.on("wrong", (evt, arg) => {
   setTimeout(() => el.classList.add("hidden"), 1500);
 })
 
+
 var vid = document.querySelector('video')
-vid.src = process.env.PREAMBLE_VIDEO
-vid.load()
-vid.play()
 vid.addEventListener('ended', () => {
   vid.classList.add('hidden')
-  ipcRenderer.send('videoended')
+  ipcRenderer.send('videodone')
+})
+
+var aud = document.querySelector('audio')
+aud.addEventListener('ended', () => {
+  ipcRenderer.send('audiodone')
+})
+
+ipcRenderer.on("videoplay", (evt, arg) => {
+  vid.src = arg
+  vid.classList.remove('hidden')
+  vid.load()
+  vid.play()
+})
+
+ipcRenderer.on("audioplay", (evt, arg) => {
+  aud.src = arg
+  aud.load()
+  aud.play()
 })
