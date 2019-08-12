@@ -16,11 +16,18 @@ class Display():
     def setQuestion(self, question):
         self._post('question', question)
 
+    def _getLabel(self, label, edge=None):
+        edge = '/' + edge if edge is not None else ''
+        return 'answer/%s%s' % (label, edge)
+
     def setAnswer(self, label, answer):
-        self._post('answer/%s' % label, answer)
+        self._post(self._getLabel(label), answer)
 
     def setCorrect(self, label):
-        self._post('answer/%s/correct' % label, '')
+        self._post(self._getLabel(label, 'correct'), '')
+
+    def setSelected(self, label):
+        self._post(self._getLabel(label, 'selected'), '')
 
     def setScore(self, score):
         self._post('score', score)
@@ -43,3 +50,6 @@ class Display():
     
     def setGameTimer(self, secs):
         self._post('timer/game', secs)
+
+    def doWrong(self):
+        self._post('wrong', '')

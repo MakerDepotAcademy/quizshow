@@ -60,10 +60,13 @@ class Button():
     def clearHooks(self):
         self._board.clearHooks()
 
+global _choices
+_choices = ['red', 'green', 'yellow', 'blue']
 class Player():
-
+    
     def __init__(self, board, bot):
-        self.buttons = { l: Button(board, i, i + 1) for l, i in zip( 'abcd', range(bot, bot + 8, 2) ) }
+        global _choices
+        self.buttons = { l: Button(board, i, i + 1) for l, i in zip( _choices, range(bot, bot + 8, 2) ) }
         self._board = board
 
     def lightAll(self, on=True):
@@ -74,10 +77,11 @@ class Player():
         return self.buttons[x]
 
     def catchAnswer(self):
-        print(self.buttons['a']._in)
-        print(self.buttons['b']._in)
-        print(self.buttons['c']._in)
-        print(self.buttons['d']._in)
+        global _choices
+        print(self.buttons[_choices[0]]._in)
+        print(self.buttons[_choices[1]]._in)
+        print(self.buttons[_choices[2]]._in)
+        print(self.buttons[_choices[3]]._in)
 
         lock = Lock()
         global ans
@@ -88,23 +92,26 @@ class Player():
             global ans
             
             try:
-                for c in 'abcd':
+                for c in _choices:
                     ans = c if self.buttons[c]._in == pin else ans
             finally:
                 lock.release()
 
-        self.buttons['a'].hook(hooker)
-        self.buttons['b'].hook(hooker)
-        self.buttons['c'].hook(hooker)
-        self.buttons['d'].hook(hooker)
+        self.buttons[_choices[0]].hook(hooker)
+        self.buttons[_choices[1]].hook(hooker)
+        self.buttons[_choices[2]].hook(hooker)
+        self.buttons[_choices[3]].hook(hooker)
 
         def timeout():
-            return lock.release()
+            try:
+                return lock.release()
+            except:
+                print('Lock release fail')
         
         t = Timer(C.RoundTime, timeout)
         t.start()
         lock.acquire(True)
-        self.buttons['a'].clearHooks()
+        self._board.clearHooks()
         lock.release()
         
         return ans
@@ -159,6 +166,11 @@ def AskQuestions(player_count):
         for row in query:
             thisPlayer = next(GP)
 
+            def flash(t):
+                thisPlayer.lightAll()
+                time.sleep(t)
+                thisPlayer.lightAll(False)
+
             print("rowid: ", row['rowid'])
             print("question: ", row['question'])
             print("yellow: ", row['yellow'])
@@ -167,37 +179,39 @@ def AskQuestions(player_count):
             print("blue: ", row['blue'])
             print("correct_answer: ", row['correct_answer'])
             C.RowID = row['rowid']
-            C.Question = row['Question']
+            C.Question = row['question']
             C.Ans_Yellow = row['yellow']
             C.Ans_Green = row['green']
             C.Ans_Red = row['red']
             C.Ans_Blue = row['blue']
             C.Ans_Correct = row['correct_answer']
 
-            thisPlayer.lightAll()
-            time.sleep(C.InviteSleep)
-            thisPlayer.lightAll(False)
+            flash(C.InviteSleep)
 
             D.setQuestion(row['question'])
-            D.setAnswer('a', row['red'])
-            D.setAnswer('b', row['green'])
-            D.setAnswer('c', row['yellow'])
-            D.setAnswer('d', row['blue'])
-            D.setRoundTimer(ROUNDTIME)
+            D.setAnswer('red', row['red'])
+            D.setAnswer('green', row['green'])
+            D.setAnswer('yellow', row['yellow'])
+            D.setAnswer('blue', row['blue'])
+            D.setRoundTimer(C.RoundTime)
             D.start()
 
             # Send question to the board and wait for answer
             print ("oh ok im here")
             ans = thisPlayer.catchAnswer()
+            D.setSelected(ans)
             if ans != row['correct_answer']:
                 print("Wrong")
                 score = score - C.DecScore
+                D.doWrong()
             else:
                 print("Correct Answer")
                 D.setCorrect(ans)
                 score = score + C.IncScore
             D.setScore(score)
             C.Score = score
+            
+            flash(C.InviteSleep / 2)
 
             if stopGameEvent.is_set():
                 AskQuestions = score
