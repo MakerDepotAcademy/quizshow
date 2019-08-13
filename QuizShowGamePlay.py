@@ -164,15 +164,13 @@ def AskQuestions(player_count):
                         RANDOM() ASC
                 ''')
         #result = {'trivia_question': [dict(zip(tuple(query.keys()), i))
-        #                              for i in query.cursor]}    
+        #                              for i in query.cursor]}
+        usedQuestions = []
         for row in query:
-            # Mark question as used in database
-            cursorObj = dbConnection.cursor()
-            update_sql = '''UPDATE go_time_trivia AS g
-                SET g.has_been_used = ?
-                where g.rowid = ?'''
-            cursorObj.execute(update_sql, (1, question['rowid']))
-            dbConnection.commit()
+            if row['rowid'] in usedQuestions:
+                continue
+            else:
+                usedQuestions += [row['rowid']]
 
             thisPlayer = next(GP)
 
