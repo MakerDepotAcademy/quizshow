@@ -141,7 +141,7 @@ def AskQuestions(player_count):
             i += 1
             if i >= len(Players.keys()):
                 i = 0
-            yield Players[Players.keys()[i]]
+            yield Players[list(Players.keys())[i]]
             
     GP = getPlayer()
     print (GP)
@@ -165,12 +165,13 @@ def AskQuestions(player_count):
                 ''')
         #result = {'trivia_question': [dict(zip(tuple(query.keys()), i))
         #                              for i in query.cursor]}
-        usedQuestions = []
+        
         for row in query:
-            if row['rowid'] in usedQuestions:
-                continue
-            else:
-                usedQuestions += [row['rowid']]
+            q = dbConnection.execute('''
+            UPDATE go_time_trivia
+            SET has_been_used = 1
+            WHERE rowid = %s;
+            ''' % row['rowid'])
 
             thisPlayer = next(GP)
 
