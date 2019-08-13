@@ -41,14 +41,15 @@ class Board():
       last = line
 
   def _write(self, l):
-    self._ser.write('%s\n' % l)
+    t = '%s\n' % l
+    self._ser.write(t.encode())
 
   def _setpin(self, pin, postfix):
     self._write('s%s%s' % (pin, postfix))
 
   def _prompt(self, p):
     self._write(p)
-    r = self._ser.readline()
+    r = self._ser.readline().decode()
     return r.strip()
 
   def turnOn(self, pin):
@@ -93,6 +94,7 @@ class Manager():
           raise Exception('isnot mine')
         self._boards[i] = b
       except Exception as e:
+        print(e)
         b.close()
 
   def __getitem__(self, i):
