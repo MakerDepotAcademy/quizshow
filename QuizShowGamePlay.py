@@ -34,6 +34,7 @@ class Config(object):
         self.InviteSleep = int(sec['INVITE_SLEEP'])
         self.BoardPlayerLimit = int(sec['BOARD_PLAYER_LIMIT'])
         self.Display_Host = sec['DISP_HOST']
+        self.Me_Host = sec['ME_HOST']
 
 
 C = Config()
@@ -271,7 +272,7 @@ def get():
 def delete():
     os.kill(os.getpid(), signal.SIGUSR1)
 
-D.hook('gameover')
+D.hook('gameover', C.Me_Host)
 D.flush()
 
 api.run(host='0.0.0.0')

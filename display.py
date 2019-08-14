@@ -63,11 +63,11 @@ class Display():
     def doWrong(self):
         self._post('wrong', '')
 
-    def hook(self, event):
+    def hook(self, event, me):
         # rsp = requests.post(self._getEndpoint('subscribe/%s' % event), data='http://%s:5000/' % gethostname())
         self._post('subscribe', {
             'event': 'gameover',
-            'uri': 'http://localhost:5000/',
+            'uri': 'http://%s/' % me,
             'method': 'GET'
         })
 
