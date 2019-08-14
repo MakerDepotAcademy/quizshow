@@ -24,53 +24,73 @@ function updateUI(channel, msg, res) {
   }
 }
 
-api.use(bodyParser.urlencoded({ extended: false }))
-
-api.use((req, res, next) => {
-  req.body = Object.keys(req.body)[0]
-  next()
-})
-
-// api.use((req, res, next) => {
-//   if (gameTicks < 1) {
-//     res.status(401).send('Game over')
-//   }
-//   else {
-//     next()
-//   }
-// })
-
-api.get('/', (req, res) => {
-  if (win) {
-    res.status(200).send('Display is working')
-  }
-  else {
+api.post('/', bodyParser.json(), (req, res) => {
+  if (!win) {
+    console.error('Display not working')
     res.status(500).send('Display is not working')
   }
+  else if (gameTicks < 0 && gameTicks != -1) {
+    console.log('Process blocked, game over')
+    res.status(400).send('Game over')
+  }
+  else {
+    /**
+   * {
+   *    "channel": "arg",
+   *    ...
+   * }
+   */
+
+    for (let key in req.body){
+      let body = req.body[key]
+
+      if (key == 'subscribe') {
+        console.log('Adding new subscription', body[key])
+        GameEvents.on(body.event, () => {
+          request(body)
+        })
+        continue
+      }
+
+      if (key.includes('timer')) {
+        if (key.includes('round')) {
+          roundTicks = roundTicksLimit = body
+        }
+        if (key.includes('game')) {
+          gameTicks = gameTicksLimit = body
+        }
+        continue
+      }
+
+      console.log('Processing ', body)
+      if (!updateUI(key, body)) {
+        res.status(500).send(`Channel ${key} failed`)
+        console.error('Process failed')
+        return
+      }
+    }
+
+    res.send('Done')
+  }
+  
 })
 
 api.delete('/', (req, res) => {
+  console.log('Quitting')
   app.quit();
   res.status(200).send('Quitting display')
-})
-
-api.post('/question', (req, res) => {
-  console.log(req, res)
-  updateUI('question', req.body, res)
-})
-
-api.post('/answer/:label', (req, res) => {
-  updateUI(req.params.label, req.body, res)
 })
 
 api.post('/start', (req, res) => {
   if (roundTicksLimit == -1 || gameTicksLimit == -1) {
     res.status(400).send('Times not set')
+    console.error('Timers not set')
     return
   }
   roundTicker = setInterval(() => {
     updateUI('roundtick', roundTicks)
     if (roundTicks-- < 1) {
+      console.log('Rounds up')
       updateUI('roundsup', '')
       roundTicks = roundTicksLimit
       clearInterval(roundTicker)
@@ -82,6 +102,7 @@ api.post('/start', (req, res) => {
     gameTicker = setInterval(() => {
       updateUI('gametick', gameTicks)
       if (gameTicks-- < 1) {
+        console.log('Game over')
         updateUI('gameover', '')
         clearInterval(gameTicker)
         GameEvents.emit('gameover')
@@ -99,77 +120,12 @@ api.post('/start', (req, res) => {
   }
 })
 
-api.post('/answer/:label/correct', (req, res) => {
-  clearInterval(roundTicker)
-  updateUI(req.params.label + 'correct', 'CORRECT', res)
+api.post('/restart', (req, res) => {
+  gameTicks = -1
+  roundTicks = -1
+  win.reload()
+  res.send('restarted')
 })
-
-api.post('/answer/:label/selected', (req, res) => {
-  updateUI(req.params.label + 'selected', '', res)
-3})
-
-const parseIntBody = (req, res, next) => {
-  req.body = parseInt(req.body)
-  next()
-}
-
-const scoreChanged = (req, res, next) => {
-  updateUI('score', score, res);
-  GameEvents.emit('scorechanged')
-}
-
-api.post('/score', parseIntBody, (req, res, next) => {
-  score = req.body
-  next()
-}, scoreChanged)
-
-api.post('/score/inc', parseIntBody, (req, res, next) => {
-  score += req.body
-  next()
-}, scoreChanged)
-
-api.post('/score/dec', parseIntBody, (req, res, next) => {
-  score -= req.body
-  next()
-}, scoreChanged)
-
-api.get('/score', (req, res) => {
-  res.status(200).send("" + score)
-})
-
-api.post('/timer/round', parseIntBody, (req, res) => {
-  clearInterval(roundTicker)
-  roundTicks = roundTicksLimit = req.body
-  res.send('ok')
-})
-
-api.post('/timer/game', parseIntBody, (req, res) => {
-  clearInterval(gameTicker)
-  gameTicks = gameTicksLimit = req.body
-  res.send('ok')
-})
-
-api.post('/wrong', (req, res) => {
-  updateUI('wrong', '', res)
-})
-
-api.post('/video/play/:name', (req, res) => {
-  updateUI('videoplay', process.env.VIDEO_LIB + '/' + req.params.name)
-  ipcMain.once('videodone', () => {
-    res.send('done')
-  })
-})
-
-api.post('/audio/play/:name', (req, res) => {
-  updateUI('audioplay', process.env.AUDIO_LIB + '/' + req.params.name)
-  ipcMain.once('audiodone', () => {
-    res.send('Done')
-  })
-})
-
-// ipcMain.once('videoended', (evt, arg) => {
-//   GameEvents.emit('videoended')
-// })
 
 app.on('ready', () => {
   // Create the browser window.
@@ -187,12 +143,7 @@ app.on('ready', () => {
   win.on('closed', () => {
     win = null
   })
+
+  api.listen(8080, '0.0.0.0', () => console.log('Listening...'))
 })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-api.listen(8080, '0.0.0.0')
