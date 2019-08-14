@@ -210,8 +210,9 @@ def AskQuestions(player_count):
 
             # Send question to the board and wait for answer
             ans = thisPlayer.catchAnswer()
-            D.setSelected(ans)
             if ans != row['correct_answer']:
+                if ans != '':
+                    D.setSelected(ans)
                 print("Wrong")
                 score = score - C.DecScore
                 D.doWrong()
@@ -244,6 +245,11 @@ score = C.InitScore
 # Start Game loop
 # Create Question thread
 questionThread = None
+def gameTimeout():
+    # This will nuke threads too, thanks brad
+    os.kill(os.getpid(), signal.SIGUSR1)
+
+gameTimer = Timer(C.GameTime, gameTimeout)
 
 # Here we start the thread and we wait 330 seconds before the code continues to execute.
 @api.route('/', methods=['POST'])
@@ -254,6 +260,7 @@ def start():
     questionThread = Thread(target=AskQuestions, args=[player_count])
     questionThread.daemon = True
     questionThread.start()
+    gameTimer.start()
     return 'ok'
 
 @api.route('/dump', methods=['GET'])
@@ -268,15 +275,9 @@ def get():
     t = props(C)
     return json.dumps(t)
 
-@api.route('/', methods=['GET'])
-def delete():
-    os.kill(os.getpid(), signal.SIGUSR1)
-
-D.hook('gameover', C.Me_Host)
 D.flush()
-
 api.run(host='0.0.0.0')
-score = questionThread.join(timeout=630)
+score = questionThread.join(timeout=C.GameTime)
 if (isinstance(score, int) == False):
     score = score = C.InitScore
 

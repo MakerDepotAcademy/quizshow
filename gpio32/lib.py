@@ -48,6 +48,8 @@ class Board():
     self._write('s%s%s' % (pin, postfix))
 
   def _prompt(self, p):
+    self._ser.flushInput()
+    self._ser.flushOutput()
     self._write(p)
     r = self._ser.readline().decode()
     return r.strip()

@@ -62,7 +62,7 @@ api.post('/', bodyParser.json(), (req, res) => {
         continue
       }
 
-      console.log('Processing ', body)
+      console.log('Processing ', key)
       if (!updateUI(key, body)) {
         res.status(500).send(`Channel ${key} failed`)
         console.error('Process failed')
@@ -104,6 +104,7 @@ api.post('/start', (req, res) => {
       if (gameTicks-- < 1) {
         console.log('Game over')
         updateUI('gameover', '')
+        clearInterval(roundTicker)
         clearInterval(gameTicker)
         GameEvents.emit('gameover')
       }
@@ -124,6 +125,8 @@ api.post('/restart', (req, res) => {
   gameTicks = -1
   roundTicks = -1
   win.reload()
+  clearInterval(roundTicker)
+  clearInterval(gameTicker)
   res.send('restarted')
 })
 
