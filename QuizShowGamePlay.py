@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 
+import sys, os, signal
 import datetime
 from sqlalchemy import create_engine
 import time
@@ -250,6 +251,7 @@ def start():
     C.PlayerCount = player_count
     
     questionThread = Thread(target=AskQuestions, args=[player_count])
+    questionThread.daemon = True
     questionThread.start()
     return 'ok'
 
@@ -267,9 +269,10 @@ def get():
 
 @api.route('/', methods=['GET'])
 def delete():
-    exit(0)
+    os.kill(os.getpid(), signal.SIGUSR1)
 
 D.hook('gameover')
+D.flush()
 
 api.run()
 score = questionThread.join(timeout=630)

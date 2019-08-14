@@ -64,7 +64,12 @@ class Display():
         self._post('wrong', '')
 
     def hook(self, event):
-        rsp = requests.post(self._getEndpoint('subscribe/%s' % event), data='http://%s:5000/' % gethostname())
+        # rsp = requests.post(self._getEndpoint('subscribe/%s' % event), data='http://%s:5000/' % gethostname())
+        self._post('subscribe', {
+            'event': 'gameover',
+            'uri': 'http://localhost:5000/',
+            'method': 'GET'
+        })
 
     def restart(self):
         requests.post(self._getEndpoint('restart'))
