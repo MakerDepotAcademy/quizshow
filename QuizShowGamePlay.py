@@ -203,10 +203,10 @@ def AskQuestions(player_count):
             D.setAnswer('yellow', row['yellow'])
             D.setAnswer('blue', row['blue'])
             D.setRoundTimer(C.RoundTime)
+            D.flush()
             D.start()
 
             # Send question to the board and wait for answer
-            print ("oh ok im here")
             ans = thisPlayer.catchAnswer()
             D.setSelected(ans)
             if ans != row['correct_answer']:
@@ -218,6 +218,7 @@ def AskQuestions(player_count):
                 D.setCorrect(ans)
                 score = score + C.IncScore
             D.setScore(score)
+            D.flush()
             C.Score = score
             
             flash(C.InviteSleep / 2)
@@ -226,6 +227,7 @@ def AskQuestions(player_count):
                 AskQuestions = score
                 print("The final score was: %5d" % (score))
                 dbConnection.close()
+                D.close()
                 return score
                 break
 
@@ -251,7 +253,7 @@ def start():
     questionThread.start()
     return 'ok'
 
-@api.route('/', methods=['GET'])
+@api.route('/dump', methods=['GET'])
 def get():
     def props(obj):
         pr = {}
@@ -262,6 +264,12 @@ def get():
         return pr
     t = props(C)
     return json.dumps(t)
+
+@api.route('/', methods=['GET'])
+def delete():
+    exit(0)
+
+D.hook('gameover')
 
 api.run()
 score = questionThread.join(timeout=630)
