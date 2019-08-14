@@ -274,7 +274,7 @@ def delete():
 D.hook('gameover')
 D.flush()
 
-api.run()
+api.run(host='0.0.0.0')
 score = questionThread.join(timeout=630)
 if (isinstance(score, int) == False):
     score = score = C.InitScore
