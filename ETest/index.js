@@ -45,7 +45,7 @@ api.post('/', bodyParser.json(), (req, res) => {
       let body = req.body[key]
 
       if (key == 'subscribe') {
-        console.log('Adding new subscription', body[key])
+        console.log('Adding new subscription', body)
         GameEvents.on(body.event, () => {
           request(body)
         })
