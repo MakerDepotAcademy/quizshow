@@ -139,6 +139,7 @@ def AskQuestions(player_count):
     dbConnection = dbConnect.connect()
 
     boards_ = [Boards[i] for i in C.BoardStack]
+    print(dir(boards_))
     Players = {}
     b = B = 0
     for c in [chr(i) for i in range(97, 97 + player_count)]:
