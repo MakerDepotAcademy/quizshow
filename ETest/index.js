@@ -105,6 +105,8 @@ api.post('/pause', (req, res) => {
   console.log('pause')
   clearInterval(gameTicker)
   clearInterval(roundTicker)
+  roundTicker = null
+  gameTicker = null
   res.send('Paused')
 })
 
