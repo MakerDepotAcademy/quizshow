@@ -101,6 +101,13 @@ const clearTimer = (round, game) => {
   }
 }
 
+api.post('/pause', (req, res) => {
+  console.log('pause')
+  clearInterval(gameTicker)
+  clearInterval(roundTicker)
+  res.send('Paused')
+})
+
 api.post('/start', (req, res) => {
   if (roundTicksLimit == -1 || gameTicksLimit == -1) {
     res.status(400).send('Times not set')

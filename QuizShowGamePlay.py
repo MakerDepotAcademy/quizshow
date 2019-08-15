@@ -284,8 +284,11 @@ def pause():
     global PAUSE
     if PAUSE.locked():
         PAUSE.release()
+        D.start()
     else:
         PAUSE.acquire(True)
+        D.pause()
+    return 'ok'
 
 D.flush()
 api.run(host='0.0.0.0')
