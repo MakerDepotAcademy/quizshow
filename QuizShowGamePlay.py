@@ -94,6 +94,12 @@ class Player():
         ans = ''
         lock.acquire(True)
 
+        def tryLockRelease():
+            try:
+                lock.release()
+            except RuntimeError as e:
+                print(e)
+
         def hooker(pin, val):
             global ans
             
@@ -101,20 +107,14 @@ class Player():
                 for c in _choices:
                     ans = c if self.buttons[c]._in == pin else ans
             finally:
-                lock.release()
+                tryLockRelease()
 
         self.buttons[_choices[0]].hook(hooker)
         self.buttons[_choices[1]].hook(hooker)
         self.buttons[_choices[2]].hook(hooker)
         self.buttons[_choices[3]].hook(hooker)
-
-        def timeout():
-            try:
-                return lock.release()
-            except:
-                print('Lock release fail')
         
-        t = Timer(C.RoundTime, timeout)
+        t = Timer(C.RoundTime, tryLockRelease)
         t.start()
         lock.acquire(True)
         self._board.clearHooks()
