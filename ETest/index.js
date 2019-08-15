@@ -93,6 +93,7 @@ api.post('/start', (req, res) => {
     return
   }
   if (!roundTicker) {
+    console.log('Starting round ticker')
     roundTicker = setInterval(() => {
       updateUI('roundtick', roundTicks)
       if (roundTicks-- < 1) {
@@ -105,6 +106,7 @@ api.post('/start', (req, res) => {
     }, 1000)
   }
   if (!gameTicker) {
+    console.log('Starting game ticker')
     gameTicker = setInterval(() => {
       updateUI('gametick', gameTicks)
       if (gameTicks-- < 1) {
