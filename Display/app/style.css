@@ -21,11 +21,6 @@
   font-size: 40px;
 }
 
-* {
-  font-family: sans-serif;
-  text-align: center;
-}
-
 .container .box#red {
   background-color: red;
 }
@@ -60,6 +55,7 @@ footer .left {
 
 h1 {
   font-size: 60px;
+  margin: 2em;
 }
 
 .hidden {
@@ -86,4 +82,14 @@ video {
 footer {
   width: 33%;
   padding-left: 33%;
+}
+
+* {
+  font-family: sans-serif;
+  text-align: center;
+  color: white
+}
+
+body, .container{
+  background-color: #333
 }
