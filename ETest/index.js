@@ -47,7 +47,12 @@ api.post('/', bodyParser.json(), (req, res) => {
       if (key == 'subscribe') {
         console.log('Adding new subscription', body)
         GameEvents.on(body.event, () => {
-          request(body)
+          try {
+            request(body)
+          }
+          catch (e) {
+            console.error(e)
+          }
         })
         continue
       }
@@ -87,18 +92,17 @@ api.post('/start', (req, res) => {
     console.error('Timers not set')
     return
   }
-  roundTicker = setInterval(() => {
-    updateUI('roundtick', roundTicks)
-    if (roundTicks-- < 1) {
-      console.log('Rounds up')
-      updateUI('roundsup', '')
-      roundTicks = roundTicksLimit
-      clearInterval(roundTicker)
-      GameEvents.emit('roundover')
-    }
-  }, 1000)
-
-  if (!gameTicker) {
+  if (!roundTicker && !gameTicker) {
+    roundTicker = setInterval(() => {
+      updateUI('roundtick', roundTicks)
+      if (roundTicks-- < 1) {
+        console.log('Rounds up')
+        updateUI('roundsup', '')
+        roundTicks = roundTicksLimit
+        clearInterval(roundTicker)
+        GameEvents.emit('roundover')
+      }
+    }, 1000)
     gameTicker = setInterval(() => {
       updateUI('gametick', gameTicks)
       if (gameTicks-- < 1) {
