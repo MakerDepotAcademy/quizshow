@@ -92,7 +92,7 @@ api.post('/start', (req, res) => {
     console.error('Timers not set')
     return
   }
-  if (!roundTicker && !gameTicker) {
+  if (!roundTicker) {
     roundTicker = setInterval(() => {
       updateUI('roundtick', roundTicks)
       if (roundTicks-- < 1) {
@@ -103,6 +103,8 @@ api.post('/start', (req, res) => {
         GameEvents.emit('roundover')
       }
     }, 1000)
+  }
+  if (!gameTicker) {
     gameTicker = setInterval(() => {
       updateUI('gametick', gameTicks)
       if (gameTicks-- < 1) {
