@@ -122,6 +122,16 @@ class Player():
         
         return ans
 
+def pause():
+    global PAUSE
+    d = PAUSE.locked()
+    if d:
+        D.pause()
+    PAUSE.acquire(True)
+    PAUSE.release()
+    if d:
+        D.start()
+
 # Ask Questions
 def AskQuestions(player_count):
     score = C.InitScore
@@ -173,16 +183,6 @@ def AskQuestions(player_count):
                 thisPlayer.lightAll()
                 time.sleep(t)
                 thisPlayer.lightAll(False)
-
-            def pause():
-                global PAUSE
-                d = PAUSE.locked()
-                if d:
-                    D.pause()
-                PAUSE.acquire(True)
-                PAUSE.release()
-                if d:
-                    D.start()
 
             print("rowid: ", row['rowid'])
             print("question: ", row['question'])
@@ -251,9 +251,16 @@ score = C.InitScore
 questionThread = None
 def gameTimeout():
     # This will nuke threads too, thanks brad
-    os.kill(os.getpid(), signal.SIGUSR1)
+    i = C.GameTime
+    while i > 0:
+        pause()
+        time.sleep(1)
+        i -= 1
+        if i == 0:
+            os.kill(os.getpid(), signal.SIGUSR1)
+            return
 
-gameTimer = Timer(C.GameTime, gameTimeout)
+gameTimer = Thread(target=gameTimeout)
 
 # Here we start the thread and we wait 330 seconds before the code continues to execute.
 @api.route('/', methods=['POST'])
