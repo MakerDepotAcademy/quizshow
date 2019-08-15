@@ -2,6 +2,7 @@ const { ipcRenderer } = require("electron");
 
 const listener = (channel, query, action) => {
   ipcRenderer.on(channel, (evt, arg) => {
+    console.log([channel, arg])
     if (!action) {
       document.querySelector(query).innerText = arg;
     }

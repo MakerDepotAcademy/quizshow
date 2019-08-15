@@ -2,6 +2,10 @@ import requests
 from json import dumps
 from socket import gethostname
 
+class DoNotUseMe(Exception):
+    def __init__(self):
+        print('DO NOT USE ME')
+
 class Display():
 
     def __init__(self, address):
@@ -43,13 +47,13 @@ class Display():
         self._post('score', score)
 
     def addScore(self, add):
-        raise Exception('DO NOT USE ME')
+        raise DoNotUseMe()
 
     def subScore(self, sub):
-        raise Exception('DO NOT USE ME')
+        raise DoNotUseMe()
 
     def getScore(self):
-        raise Exception('DO NOT USE ME')
+        raise DoNotUseMe()
 
     def start(self):
         requests.post(self._getEndpoint('start'))
@@ -79,3 +83,9 @@ class Display():
 
     def pause(self):
         requests.post(self._getEndpoint('pause'))
+
+    def playVideo(self, vidpath):
+        requests.post(self._getEndpoint('videoplay'), vidpath)
+
+    def playAudio(self, audpath):
+        requests.post(self._getEndpoint('audioplay'), audpath)
