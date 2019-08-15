@@ -76,3 +76,6 @@ class Display():
 
     def close(self):
         requests.delete(self._getEndpoint(''))
+
+    def pause(self):
+        requests.post(self._getEndpoint('pause'))

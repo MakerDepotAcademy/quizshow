@@ -11,11 +11,14 @@ from flask import Flask, request
 import configparser
 import json
 import inspect
+from itertools import cycle
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
 Boards = Manager()
 api = Flask(__name__)
+global PAUSE
+PAUSE = Lock()
 
 class Config(object):
 
@@ -35,7 +38,6 @@ class Config(object):
         self.BoardPlayerLimit = int(sec['BOARD_PLAYER_LIMIT'])
         self.Display_Host = sec['DISP_HOST']
         self.Me_Host = sec['ME_HOST']
-
 
 C = Config()
 
@@ -136,18 +138,7 @@ def AskQuestions(player_count):
             B += 1
         else:
             b += 1
-
-    def getPlayer():
-        i = 0
-        while True:
-            i += 1
-            if i >= len(Players.keys()):
-                i = 0
-            yield Players[list(Players.keys())[i]]
-            
-    GP = getPlayer()
-    print (GP)
-             
+                        
     while (1):
         # Ask question and verify answer
         query = dbConnection.execute('''SELECT
@@ -168,6 +159,7 @@ def AskQuestions(player_count):
         #result = {'trivia_question': [dict(zip(tuple(query.keys()), i))
         #                              for i in query.cursor]}
         
+        GP = cycle(Players.values()) 
         for row in query:
             q = dbConnection.execute('''
             UPDATE go_time_trivia
@@ -181,6 +173,16 @@ def AskQuestions(player_count):
                 thisPlayer.lightAll()
                 time.sleep(t)
                 thisPlayer.lightAll(False)
+
+            def pause():
+                global PAUSE
+                d = PAUSE.locked()
+                if d:
+                    D.pause()
+                PAUSE.acquire(True)
+                PAUSE.release()
+                if d:
+                    D.start()
 
             print("rowid: ", row['rowid'])
             print("question: ", row['question'])
@@ -197,6 +199,7 @@ def AskQuestions(player_count):
             C.Ans_Blue = row['blue']
             C.Ans_Correct = row['correct_answer']
 
+            pause()
             flash(C.InviteSleep)
 
             D.setQuestion(row['question'])
@@ -208,6 +211,7 @@ def AskQuestions(player_count):
             D.flush()
             D.start()
 
+            pause()
             # Send question to the board and wait for answer
             ans = thisPlayer.catchAnswer()
             if ans != row['correct_answer']:
@@ -274,6 +278,14 @@ def get():
         return pr
     t = props(C)
     return json.dumps(t)
+
+@api.route('/pause', methods=['GET'])
+def pause():
+    global PAUSE
+    if PAUSE.locked():
+        PAUSE.release()
+    else:
+        PAUSE.acquire(True)
 
 D.flush()
 api.run(host='0.0.0.0')
