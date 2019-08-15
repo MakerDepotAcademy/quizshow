@@ -287,14 +287,13 @@ def get():
     return json.dumps(t)
 
 @api.route('/pause', methods=['GET'])
-def pause():
+def handlepause():
     global PAUSE
     if PAUSE.locked():
         PAUSE.release()
-        D.start()
     else:
         PAUSE.acquire(True)
-        D.pause()
+        
     return 'ok'
 
 D.flush()

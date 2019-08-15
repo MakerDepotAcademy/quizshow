@@ -11,6 +11,8 @@ class Display():
     def __init__(self, address):
         self._address = address
         self._payload = dict()
+        self.isPaused = False
+        self.isRunning = False
 
     def _getEndpoint(self, endpoint):
         return 'http://%s/%s' % (self._address, endpoint)
@@ -56,6 +58,7 @@ class Display():
         raise DoNotUseMe()
 
     def start(self):
+        self.isRunning = True
         requests.post(self._getEndpoint('start'))
 
     def setRoundTimer(self, secs):
@@ -82,6 +85,7 @@ class Display():
         requests.delete(self._getEndpoint(''))
 
     def pause(self):
+        self.isPaused = not self.isPaused
         requests.post(self._getEndpoint('pause'))
 
     def playVideo(self, vidpath):
