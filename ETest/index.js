@@ -86,6 +86,21 @@ api.delete('/', (req, res) => {
   res.status(200).send('Quitting display')
 })
 
+const clearTimer = (round, game) => {
+  if (round) {
+    console.log('Clearing round timer')
+    clearInterval(roundTicker)
+    roundTicker = null
+    roundTicks = roundTicksLimit
+  }
+  if (game) {
+    console.log('Clearing game timer')
+    clearInterval(gameTicker)
+    gameTicker = null
+    gameticks = gameTicksLimit
+  }
+}
+
 api.post('/start', (req, res) => {
   if (roundTicksLimit == -1 || gameTicksLimit == -1) {
     res.status(400).send('Times not set')
@@ -99,8 +114,7 @@ api.post('/start', (req, res) => {
       if (roundTicks-- < 1) {
         console.log('Rounds up')
         updateUI('roundsup', '')
-        roundTicks = roundTicksLimit
-        clearInterval(roundTicker)
+        clearTimer(true, false)
         GameEvents.emit('roundover')
       }
     }, 1000)
@@ -112,8 +126,7 @@ api.post('/start', (req, res) => {
       if (gameTicks-- < 1) {
         console.log('Game over')
         updateUI('gameover', '')
-        clearInterval(roundTicker)
-        clearInterval(gameTicker)
+        clearTimer(true, true)
         GameEvents.emit('gameover')
       }
     }, 1000)
@@ -130,11 +143,8 @@ api.post('/start', (req, res) => {
 })
 
 api.post('/restart', (req, res) => {
-  gameTicks = -1
-  roundTicks = -1
+  clearTimer(true, true)
   win.reload()
-  clearInterval(roundTicker)
-  clearInterval(gameTicker)
   res.send('restarted')
 })
 
