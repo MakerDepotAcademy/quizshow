@@ -122,7 +122,7 @@ class Player():
         
         return ans
 
-def pause():
+def blockIfPaused():
     global PAUSE
     d = PAUSE.locked()
     if d:
@@ -199,7 +199,7 @@ def AskQuestions(player_count):
             C.Ans_Blue = row['blue']
             C.Ans_Correct = row['correct_answer']
 
-            pause()
+            blockIfPaused()
             flash(C.InviteSleep)
 
             D.setQuestion(row['question'])
@@ -211,7 +211,7 @@ def AskQuestions(player_count):
             D.flush()
             D.start()
 
-            pause()
+            blockIfPaused()
             # Send question to the board and wait for answer
             ans = thisPlayer.catchAnswer()
             if ans != row['correct_answer']:
@@ -253,7 +253,7 @@ def gameTimeout():
     # This will nuke threads too, thanks brad
     i = C.GameTime
     while i > 0:
-        pause()
+        blockIfPaused()
         time.sleep(1)
         i -= 1
         if i == 0:
