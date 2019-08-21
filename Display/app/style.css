@@ -1,62 +1,55 @@
 .container {
   margin: 20px auto;
   width: 100%;
-  height: 20%;
-  background-color: #fff;
+  height: 50%;
+  background-color: rgba(255, 255, 255, 0) !important;
   display: grid;
   grid-template-columns: auto auto;
   grid-row: auto auto;
   grid-column: auto;
   grid-gap: 10px;
+  --opacity: 0.8;
 }
 
 .container .box {
-  background-color: #333;
-  padding: 20px;
-  border-radius: 10px;
-  color: #fff;
+  border-radius: 40px;
+  color: white !important;
   display: flex;
   align-items: center;
-  justify-content: left;
-  font-size: 40px;
+  justify-content: center;
+  font-size: 8vh;
 }
 
 .container .box#red {
-  background-color: red;
+  background-color: rgba(255, 0, 0, var(--opacity));
 }
 .container .box#green {
-  background-color: green;
+  background-color: rgba(0, 128, 0, var(--opacity));
 }
 .container .box#blue {
-  background-color: blue;
+  background-color: rgba(0, 0, 255, var(--opacity));
 }
 .container .box#yellow {
-  background-color: yellow;
+  background-color: rgba(255, 255, 0, var(--opacity));
 }
 
-footer .right {
+.right {
   float: right;
   justify-content: right;
 }
 
-footer .left {
+.left {
   float: left;
   justify-content: left;
 }
 
-.label {
-  font-style: italic;
-  color: orange;
-}
-
-.label, #answer {
-  text-shadow: 1px 1px 2px black;
-}
-
 h1 {
-  font-size: 60px;
-  margin: 2em;
+  font-size: 10vh;
+  background: -webkit-linear-gradient(45deg, rgb(9, 0, 159), rgb(0, 255, 149) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+
 
 .hidden {
   display: none;
@@ -79,17 +72,27 @@ video {
   background-size: cover;
 }
 
-footer {
-  width: 33%;
-  padding-left: 33%;
+
+header > .right {
+  border: 2px solid greenyellow;
+  background-color: white !important;
+  padding: 5px;
+  margin-top: 5vh;
+  margin-right: 10vw;
+}
+
+header > .left {
+  margin-left: 15vw;
 }
 
 * {
   font-family: sans-serif;
   text-align: center;
-  color: white
+  /* color: black; */
 }
 
-body, .container{
-  background-color: #333
+body{
+  background-image: url('background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
