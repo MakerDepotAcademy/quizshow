@@ -3,10 +3,17 @@
 </head>
 
 <body>
-  <video autoplay></video>
+  <!-- <video autoplay></video> -->
   <audio class="hidden"></audio>
   <header>
-    <h1>Quiz show</h1>
+    <div class="left">
+      <h1>Quiz show</h1>
+    </div>
+    <div class="right">
+      <h3>Score: <span id="score"></span></h3>
+      <h3>Round time: <span id="round_time" class="timer"></span></h3>
+      <h3>Game time: <span id="game_time" class="timer"></span></h3>
+    </div>
   </header>
 
 
@@ -17,21 +24,11 @@
   <h1 id="wrong" class="hidden alert">Nope</h1>
   
   <div class="container">
-    <div id="red" class="box"><span class="label">A:</span>&nbsp;<span id="answer"></span></div>
-    <div id="green" class="box"><span class="label">B:</span>&nbsp;<span id="answer"></span></div>
-    <div id="blue" class="box"><span class="label">C:</span>&nbsp;<span id="answer"></span></div>
-    <div id="yellow" class="box"><span class="label">D:</span>&nbsp;<span id="answer"></span></div>
+    <div id="red" class="box"><span id="answer">Test</span></div>
+    <div id="green" class="box"><span id="answer">Test</span></div>
+    <div id="blue" class="box"><span id="answer">Test</span></div>
+    <div id="yellow" class="box"><span id="answer">Test</span></div>
   </div>
-
-  <footer>
-    <div class="right">
-      <h3>Score: <span id="score"></span></h3>
-    </div>
-    <div class="left">
-      <h3>Round time: <span id="round_time" class="timer"></span></h3>
-      <h3>Game time: <span id="game_time" class="timer"></span></h3>
-    </div>
-  </footer>
 
   <script src="app.js"></script>
 </body>
