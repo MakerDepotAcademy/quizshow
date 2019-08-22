@@ -38,6 +38,7 @@ class Config(object):
         self.BoardPlayerLimit = int(sec['BOARD_PLAYER_LIMIT'])
         self.Display_Host = sec['DISP_HOST']
         self.Me_Host = sec['ME_HOST']
+        self.Video = sec['PREAMBLE_VID']
 
 C = Config()
 
@@ -46,7 +47,7 @@ D.setGameTimer(C.GameTime)
 
 class Button():
 
-    def __init__(self, board, pin_in, pin_out):
+    def __init__(self, board, pin_out, pin_in):
         self._board = board
         self._in = pin_in
         self._out = pin_out
@@ -134,6 +135,8 @@ def blockIfPaused():
 
 # Ask Questions
 def AskQuestions(player_count):
+    D.playVideo(C.Video)
+
     score = C.InitScore
     dbConnect = create_engine(C.DB_URL)
     dbConnection = dbConnect.connect()
