@@ -91,7 +91,7 @@ class Manager():
       b = None
       try:
         b = Board(acm)
-        i = b.getID()
+        i = str(b.getID())
         if not re.search(r'[a-zA-Z0-9]+', i):
           raise Exception('isnot mine')
         self._boards[i] = b
