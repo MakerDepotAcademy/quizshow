@@ -33,6 +33,10 @@
   background-color: rgba(255, 255, 0, var(--opacity));
 }
 
+.left, .right {
+  display: block;
+}
+
 .right {
   float: right;
   justify-content: right;
@@ -50,6 +54,9 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
+h1#question {
+  font-size: 8vh;
+}
 
 .hidden {
   display: none;
@@ -72,6 +79,9 @@ video {
   background-size: cover;
 }
 
+header { 
+  display: inline-block;
+}
 
 header > .right {
   border: 2px solid greenyellow;
