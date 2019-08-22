@@ -1,2 +1,5 @@
 sqlalchemy
 flask
+serial
+requests
+pathlib
