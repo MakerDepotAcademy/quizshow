@@ -8,9 +8,9 @@
     "type": "node",
     "request": "launch",
     "name": "Electron Main",
-    "runtimeExecutable": "${workspaceFolder}/ETest/node_modules/.bin/electron",
-    "program": "${workspaceFolder}/ETest/index.js",
-    "cwd": "${workspaceFolder}/ETest"
+    "runtimeExecutable": "${workspaceFolder}/Display/node_modules/.bin/electron",
+    "program": "${workspaceFolder}/Display/index.js",
+    "cwd": "${workspaceFolder}/Display"
   },
     {
       "name": "Python: Quiz Show Game Play",
