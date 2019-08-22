@@ -97,7 +97,7 @@ class Player():
         def tryLockRelease():
             try:
                 lock.release()
-            except RuntimeError as e:
+            except:
                 print(e)
 
         def hooker(pin, val):
