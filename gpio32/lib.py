@@ -5,12 +5,13 @@ import re
 
 class Board():
   
-  def __init__(self, port):
+  def __init__(self, port, qu=32):
     self._ser = serial.Serial(str(port), 2000000, timeout=1)
     self._ser.flushInput()
     self._ser.flushOutput()
     self._hooks = []
-
+    self.queue = ['x'] * qu
+    self._queuelen = qu
     self._eventThread = threading.Thread(target=self._eventLoop)
     self._eventAlive = False
 
@@ -40,28 +41,34 @@ class Board():
 
       last = line
 
-  def _write(self, l):
-    t = '%s\n' % l
+  def run(self):
+    t = ''.join(self.queue) + '\n'
     self._ser.write(t.encode())
+    self.queue = ['x'] * self._queuelen
+    # self._ser.flushInput()
+    # self._ser.flushOutput()
 
-  def _setpin(self, pin, postfix):
-    self._write('s%s%s' % (pin, postfix))
+  def _setpin(self, pin, val):
+    # self.queue[pin] = '1' if postfix == '+' else '0'
+    self.queue[pin] = val
 
   def _prompt(self, p):
-    self._ser.flushInput()
-    self._ser.flushOutput()
-    self._write(p)
+    self.run()
+    self._ser.write(p)
     r = self._ser.readline().decode()
     return r.strip()
 
   def turnOn(self, pin):
-    self._setpin(pin, '+')
+    self._setpin(pin, '1')
 
   def turnOff(self, pin):
-    self._setpin(pin, '-')
+    self._setpin(pin, '0')
 
   def setInput(self, pin, inverse=False):
     self._setpin(pin, 'u' if inverse else 'i')
+
+  def unsetInput(self, pin, inverse=False):
+    self._setpin(pin, 'U' if inverse else 'I')
 
   def getID(self):
     return self._prompt('?')
@@ -74,6 +81,13 @@ class Board():
 
   def onChange(self, hook, pin=-1):
     self._hooks.append((hook, pin))
+    
+    if pin == -1:
+      self.queue = 'e' * self._queuelen
+    else:
+      self.queue[pin] = 'e'
+
+    self.run()
 
     if not self._eventAlive:
       self._eventThread.start()
@@ -81,6 +95,16 @@ class Board():
 
   def clearHooks(self):
     self._hooks = []
+    self.queue = 'd' * self._queuelen
+    self.run()
+
+  def clearHook(self, pin):
+    for i, ent in enumerate(self._hooks):
+      if ent[1] == pin:
+        del self._hooks[i]
+        self.queue[pin] == 'd'
+
+    self.run()
 
 class Manager():
   
