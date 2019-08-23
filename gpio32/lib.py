@@ -6,7 +6,7 @@ import re
 class Board():
   
   def __init__(self, port, qu=32):
-    self._ser = serial.Serial(str(port), 2000000, timeout=100)
+    self._ser = serial.Serial(str(port), 2000000, timeout=1)
     self._ser.flushInput()
     self._ser.flushOutput()
     self._hooks = []
@@ -104,24 +104,42 @@ class Board():
 
     self.run()
 
-  def awaitChange(self, *pins):
-    last = ''
+  def awaitChange(self, pins, timeout):
+    def m(l):
+      return re.match(r'[01]', l)
+
+    def readline(t=timeout):
+      l = ''
+      while t > 0:
+        l = self._ser.readline()
+        if l == '':
+          t -= 1
+        else:
+          return l
+      raise Exception('Timeout')
+
+    
     for p in pins:
-      self.setInterrupt(p)
+      self.setInput(p)
 
     self.run()
-
+    last = ''
+    while not last:
+      last = readline()
+      last = '' if not m(last) else last
+      
     while True:
-      l = self._ser.readline()
+      l = readline()
       if l == last:
         continue
-      else:
-        last = l
       
-      if re.match(r'[01]', l): 
+      if m(l): 
         for p in pins:
+          p -= 1
           if l[p] != last[p]:
-            return pin
+            return p + 1
+
+        last = l
 
 class Manager():
   
