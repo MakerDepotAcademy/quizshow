@@ -93,3 +93,6 @@ class Display():
 
     def playAudio(self, audpath):
         requests.post(self._getEndpoint('audioplay'), audpath)
+
+    def restart(self):
+        requests.post(self._getEndpoint('restart'), '')
