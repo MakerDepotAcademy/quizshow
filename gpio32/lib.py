@@ -1,19 +1,20 @@
 import serial
 from pathlib import Path
-import threading
+from threading import Thread, Lock
 import re
 
 class Board():
   
   def __init__(self, port, qu=32):
-    self._ser = serial.Serial(str(port), 2000000, timeout=1)
+    self._ser = serial.Serial(str(port), 2000000, timeout=100)
     self._ser.flushInput()
     self._ser.flushOutput()
     self._hooks = []
     self.queue = ['x'] * qu
     self._queuelen = qu
-    self._eventThread = threading.Thread(target=self._eventLoop)
+    self._eventThread = Thread(target=self._eventLoop)
     self._eventAlive = False
+    self._eventLock = Lock()
 
   def close(self):
     self._ser.close()
@@ -21,16 +22,11 @@ class Board():
   def _eventLoop(self):
     last = ''
     while True:
+      self._eventLock.acquire(True)
       line = self._ser.readline()
+      self._eventLock.release()
 
-      if len(line) == 0:
-        continue
-
-      if len(line) != 34:
-        self._ser.seek(len(line), 2)
-        continue
-
-      if last == line:
+      if len(line) == 0 or last == line:
         continue
       
       for i, (c, l) in enumerate(zip(line, last)):
@@ -45,17 +41,16 @@ class Board():
     t = ''.join(self.queue) + '\n'
     self._ser.write(t.encode())
     self.queue = ['x'] * self._queuelen
-    # self._ser.flushInput()
-    # self._ser.flushOutput()
 
   def _setpin(self, pin, val):
-    # self.queue[pin] = '1' if postfix == '+' else '0'
-    self.queue[pin] = val
+    self.queue[pin - 1] = val
 
   def _prompt(self, p):
     self.run()
+    self._eventLock.acquire(True)
     self._ser.write(p)
     r = self._ser.readline().decode()
+    self._eventLock.release()
     return r.strip()
 
   def turnOn(self, pin):
@@ -69,6 +64,9 @@ class Board():
 
   def unsetInput(self, pin, inverse=False):
     self._setpin(pin, 'U' if inverse else 'I')
+
+  def setInterrupt(self, pin, enabled=True):
+    self._setpin(pin, 'e' if enabled else 'd')
 
   def getID(self):
     return self._prompt('?')
@@ -85,7 +83,7 @@ class Board():
     if pin == -1:
       self.queue = 'e' * self._queuelen
     else:
-      self.queue[pin] = 'e'
+      self.queue[pin - 1] = 'e'
 
     self.run()
 
@@ -102,9 +100,28 @@ class Board():
     for i, ent in enumerate(self._hooks):
       if ent[1] == pin:
         del self._hooks[i]
-        self.queue[pin] == 'd'
+        self.queue[pin - 1] == 'd'
 
     self.run()
+
+  def awaitChange(self, *pins):
+    last = ''
+    for p in pins:
+      self.setInterrupt(p)
+
+    self.run()
+
+    while True:
+      l = self._ser.readline()
+      if l == last:
+        continue
+      else:
+        last = l
+      
+      if re.match(r'[01]', l): 
+        for p in pins:
+          if l[p] != last[p]:
+            return pin
 
 class Manager():
   
