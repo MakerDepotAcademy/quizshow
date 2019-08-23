@@ -43,6 +43,7 @@ class Config(object):
 C = Config()
 
 D = Display(C.Display_Host)
+D.restart()
 D.setGameTimer(C.GameTime)
 
 class Button():
@@ -79,49 +80,28 @@ class Player():
     def lightAll(self, on=True):
         for b in self.buttons:
             self.buttons[b].light(on)
+        self._board.run()
 
     def __getitem__(self, x):
         return self.buttons[x]
 
     def catchAnswer(self):
         global _choices
-        print(self.buttons[_choices[0]]._in)
-        print(self.buttons[_choices[1]]._in)
-        print(self.buttons[_choices[2]]._in)
-        print(self.buttons[_choices[3]]._in)
-
-        lock = Lock()
-        global ans
-        ans = ''
-        lock.acquire(True)
-
-        def tryLockRelease():
-            try:
-                lock.release()
-            except:
-                print(e)
-
-        def hooker(pin, val):
-            global ans
-            
-            try:
-                for c in _choices:
-                    ans = c if self.buttons[c]._in == pin else ans
-            finally:
-                tryLockRelease()
-
-        self.buttons[_choices[0]].hook(hooker)
-        self.buttons[_choices[1]].hook(hooker)
-        self.buttons[_choices[2]].hook(hooker)
-        self.buttons[_choices[3]].hook(hooker)
+        def b(i=None):
+            if i != None:
+                return self.buttons[_choices[i]]._in
+            else:
+                return [b(i) for i in range(len(_choices))]
         
-        t = Timer(C.RoundTime, tryLockRelease)
-        t.start()
-        lock.acquire(True)
-        self._board.clearHooks()
-        lock.release()
-        
-        return ans
+        print(b())
+        try:
+            ret = self._board.awaitChange(b(), C.RoundTime)
+        except:
+            return ''
+
+        for i in range(3):
+            if ret == self.buttons[_choices[i]]._in:
+                return _choices[i]
 
 def blockIfPaused():
     global PAUSE
@@ -146,7 +126,7 @@ def AskQuestions(player_count):
     Players = {}
     b = B = 0
     for c in [chr(i) for i in range(97, 97 + player_count)]:
-        Players[c] = Player(boards_[B], (b * 8) + 1)
+        Players[c] = Player(boards_[B], (b * 8))
         if b >= C.BoardPlayerLimit:
             b = 0
             B += 1
