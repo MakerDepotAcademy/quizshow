@@ -121,7 +121,7 @@ def AskQuestions(player_count):
     dbConnect = create_engine(C.DB_URL)
     dbConnection = dbConnect.connect()
 
-    boards_ = [Boards[i] for i in C.BoardStack]
+    boards_ = [Boards[int(i)] for i in C.BoardStack]
     print(dir(boards_))
     Players = {}
     b = B = 0

@@ -150,10 +150,11 @@ class Manager():
       b = None
       try:
         b = Board(acm)
-        i = str(b.getID())
-        if not re.search(r'[a-zA-Z0-9]+', i):
-          raise Exception('isnot mine')
-        self._boards[i] = b
+        for a in range(5): # For 5 attempts
+          i = b.getID()
+          if re.search(r'[0-9]+', i):
+            self._boards[int(i)] = b
+            break
       except Exception as e:
         print(e)
         b.close()
