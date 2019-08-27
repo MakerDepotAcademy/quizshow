@@ -12,6 +12,7 @@ import configparser
 import json
 import inspect
 from itertools import cycle
+import check_conf as boardconfig
 
 # Event object used to send signals from one thread to another
 stopGameEvent = Event()
@@ -72,10 +73,11 @@ global _choices
 _choices = ['red', 'green', 'yellow', 'blue']
 class Player():
     
-    def __init__(self, board, bot):
+    def __init__(self, board, buttonsDict):
         global _choices
-        self.buttons = { l: Button(board, i, i + 1) for l, i in zip( _choices, range(bot, bot + 8, 2) ) }
-        self._board = board
+        # self.buttons = { l: Button(board, i, i + 1) for l, i in zip( _choices, range(bot, bot + 8, 2) ) }
+        for c in _choices:
+            self.buttons[c] = Button(board, buttonsDict[c]['out'], buttonsDict[c]['in'])
 
     def lightAll(self, on=True):
         for b in self.buttons:
@@ -100,7 +102,7 @@ class Player():
             return ''
 
         for i in range(3):
-            if ret == self.buttons[_choices[i]]._in:
+            if ret == b(i):
                 return _choices[i]
 
 def blockIfPaused():
@@ -121,17 +123,24 @@ def AskQuestions(player_count):
     dbConnect = create_engine(C.DB_URL)
     dbConnection = dbConnect.connect()
 
-    boards_ = [Boards[int(i)] for i in C.BoardStack]
-    print(dir(boards_))
+    # boards_ = [Boards[int(i)] for i in C.BoardStack]
+    # print(dir(boards_))
     Players = {}
-    b = B = 0
-    for c in [chr(i) for i in range(97, 97 + player_count)]:
-        Players[c] = Player(boards_[B], (b * 8))
-        if b >= C.BoardPlayerLimit:
-            b = 0
-            B += 1
-        else:
-            b += 1
+    # b = B = 0
+    # for c in [chr(i) for i in range(97, 97 + player_count)]:
+    #     Players[c] = Player(boards_[B], (b * 8))
+    #     if b >= C.BoardPlayerLimit:
+    #         b = 0
+    #         B += 1
+    #     else:
+    #         b += 1
+
+    
+    if boardconfig.check():
+        conf = boardconfig.load()    
+        for key, value in conf.items():
+            Player[key] = Player(Boards[value['board_id']], value['buttons'])
+
                         
     while (1):
         # Ask question and verify answer

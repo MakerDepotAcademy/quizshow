@@ -1,0 +1,44 @@
+{
+  "a": {
+    "board_id": 1,
+    "buttons": {
+      "red": {
+        "out": 1,
+        "in": 2
+      },
+      "green": {
+        "out": 3,
+        "in": 4
+      },
+      "blue": {
+        "out": 5,
+        "in": 6
+      },
+      "yellow": {
+        "out": 7,
+        "in": 8
+      }
+    }
+  },
+  "b": {
+    "board_id": 2,
+    "buttons": {
+      "red": {
+        "out": 9,
+        "in": 10
+      },
+      "green": {
+        "out": 11,
+        "in": 12
+      },
+      "blue": {
+        "out": 13,
+        "in": 14
+      },
+      "yellow": {
+        "out": 15,
+        "in": 16
+      }
+    }
+  }
+}
