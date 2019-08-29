@@ -1,9 +1,11 @@
-import components.questions as Questions
-import components.player as Player
-from components.display import Display, displayQuestion
-import components.settings as Settings
-from components.pause import Pause
+from flask import Flask, request
+from threading import Thread
 
+import components.player as Player
+import components.questions as Questions
+import components.settings as Settings
+from components.display import Display, displayQuestion
+from components.pause import Pause
 
 Times = Settings.Time()
 Links = Settings.Links()
@@ -14,34 +16,63 @@ disp = Display(Links.Display_Host)
 disp.setRoundTimer(Times.Round_Time)
 disp.setGameTimer(Times.Game_Time)
 
-plyrs = Player.assignPlayers(5)
-
 def hook_pause(isPaused):
-  pass
+  if isPaused:
+    disp.pause()
+  else:
+    disp.start()
 
 Pause = Pause(hook_pause)
 
-for question, player in zip(Questions.getQuestions(), Player.cyclePlayers(plyrs)):
-  Pause.block_if_paused()
-  player.flash(Times.Invite_Sleep)
+def gameLoop(pc):
+  plyrs = Player.assignPlayers(pc)
+  Q = Questions.getQuestions()
+  P = Player.cyclePlayers(plyrs)
+  while True:
+    question = next(Q)
+    player = next(P)
 
-  Pause.block_if_paused()
-  displayQuestion(disp, question)
+    Pause.block_if_paused()
+    player.flash(Times.Invite_Sleep)
 
-  Pause.block_if_paused()
-  disp.start()
+    Pause.block_if_paused()
+    question.show()
+    displayQuestion(disp, question)
 
-  Pause.block_if_paused()
-  ans = player.catchAnswer()
+    Pause.block_if_paused()
+    disp.start()
 
-  Pause.block_if_paused()
-  if question.checkAnswer(ans):
-    disp.setCorrect(ans)
-    Scores.score += Scores.Inc
+    Pause.block_if_paused()
+    ans = player.catchAnswer()
+
+    Pause.block_if_paused()
+    if question.checkAnswer(ans):
+      disp.setCorrect(ans)
+      Scores.score += Scores.Inc
+    else:
+      disp.doWrong()
+      disp.setSelected(ans)
+      Scores.score -= Scores.Dec
+
+    disp.setScore(Scores.score)
+    disp.flush()
+
+
+app = Flask(__name__)
+
+@app.route('/start', methods=['POST'])
+def flask_start_game():
+  pc = request.form['playerCount']
+  t = Thread(target=gameLoop, args=[int(pc)])
+  t.start()
+  return 'started'
+
+@app.route('/pause')
+def flask_pause_game():
+  Pause.pause()
+  if Pause.isPaused():
+    return 'Game is paused'
   else:
-    disp.doWrong()
-    disp.setSelected(ans)
-    Scores.score -= Scores.Dec
+    return 'Game is running'
 
-  disp.setScore(Scores.score)
-  disp.flush()
+app.run(host='0.0.0.0', port=5000)
