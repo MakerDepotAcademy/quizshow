@@ -10,8 +10,11 @@ class Pause():
     self._lock.acquire(True)
     self._lock.release()
 
+  def isPaused(self):
+    return self._lock.isLocked()
+
   def pause(self):
-    if self._lock.isLocked():
+    if self.isPaused():
       self._lock.release()
       self._hook(False)
     else:
