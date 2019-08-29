@@ -1,6 +1,7 @@
 import toml
 
-_config = toml.loads('../config.cfg')
+with open('./config.cfg') as c:
+  _config = toml.loads(c.read())
 
 
 class Section():
@@ -26,7 +27,7 @@ class BoardStack(Section):
   def __init__(self):
     Section.__init__(self, 'BOARDS')
     self.Board_Stack = [int(i) for i in self._section['BOARD_STACK'].split(',')]
-    self.Board_Player_Limit = _config['BOARD_PLAYER_LIMIT']
+    self.Board_Player_Limit = self._section['BOARD_PLAYER_LIMIT']
 
 
 class Scores(Section):
