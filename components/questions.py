@@ -16,6 +16,16 @@ class Question():
   def checkAnswer(self, ans):
     return ans == self.correct
 
+  def show(self):
+    print('''
+    Question: %s
+    Correct answer: %s
+    Red: %s
+    Green: %s,
+    Blue: %s,
+    Yellow: %s
+    ''' % (self.question, self.correct, self.answers['red'], self.answers['green'], self.answers['blue'], self.answers['yellow']))
+
 def getQuestions():
   dbConnect = create_engine(Database().URL)
   dbConnection = dbConnect.connect()
