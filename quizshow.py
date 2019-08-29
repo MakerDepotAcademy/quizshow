@@ -1,6 +1,6 @@
 import components.questions as Questions
 import components.player as Player
-import components.display as Display
+from components.display import Display, displayQuestion
 import components.settings as Settings
 from components.pause import Pause
 
