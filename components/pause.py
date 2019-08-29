@@ -11,7 +11,7 @@ class Pause():
     self._lock.release()
 
   def isPaused(self):
-    return self._lock.isLocked()
+    return self._lock.locked()
 
   def pause(self):
     if self.isPaused():
