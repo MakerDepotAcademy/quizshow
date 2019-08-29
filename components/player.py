@@ -2,7 +2,8 @@ from time import sleep
 
 from itertools import cycle
 from questions import CHOICES
-from settings import BoardStack
+from settings import BoardStack, Time
+from gpio32.lib import Manager
 
 
 class Button():
@@ -55,23 +56,26 @@ class Player():
       else:
         return [b(i) for i in range(len(CHOICES))]
         
-      try:
-        ret = self._board.awaitChange(b(), C.RoundTime)
-      except:
-        return ''
+    try:
+      ret = self._board.awaitChange(b(), Time().Round_Time)
+    except:
+      return ''
 
-      for i in range(3):
-        if ret == self.buttons[CHOICES[i]]._in:
-          return CHOICES[i]
+    for i in range(3):
+      if ret == b(i):
+        return CHOICES[i]
 
 
-def assignPlayers(manager, player_count):
+def assignPlayers(player_count):
   Settings = BoardStack()
+  manager = Manager()
   boards = [manager[i] for i in Settings.Board_Stack]
   Players = []
 
   for i in range(player_count):
-    p = Player(boards([i // (player_count-1)], (i % 5) * 8), i)
+    b = boards[i // (player_count-1)]
+    s = (i % 5) * 8
+    p = Player(b, s, i)
     Players.append(p)
 
   return Players
