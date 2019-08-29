@@ -130,9 +130,11 @@ class Board():
 
     
     for p in pins:
-      self.setInput(p, True)
-
+      self.setInput(p, False)
     self.run()
+
+    print(pins)
+
     last = ''
     while not last:
       last = readline()
@@ -166,7 +168,6 @@ class Manager():
             break
       except Exception as e:
         print(e)
-        b.close()
 
   def __getitem__(self, i):
     return self.getBoardByID(i)
