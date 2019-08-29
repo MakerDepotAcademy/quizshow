@@ -8,7 +8,7 @@ from gpio32.lib import Manager
 
 class Button():
 
-  def __init__(self, board, pin_out, pin_in):
+  def __init__(self, board, pin_in, pin_out):
     self._board = board
     self._in = pin_in
     self._out = pin_out
@@ -32,7 +32,10 @@ class Button():
 class Player():
     
   def __init__(self, board, bot, id=None):
-    self.buttons = { l: Button(board, i, i + 1) for l, i in zip( CHOICES, range(bot, bot + 8, 2) ) }
+    self.buttons = {}
+    tr = iter(range(bot, bot + 8))
+    for c in CHOICES:
+      self.buttons[c] = Button(board, next(tr), next(tr))
     self._board = board
     self._id = id
 
@@ -73,9 +76,9 @@ def assignPlayers(player_count):
   Players = []
 
   for i in range(player_count):
-    b = boards[i // (player_count-1)]
-    s = (i % 5) * 8
-    p = Player(b, s, i)
+    b = i // (player_count-1)
+    s = (i % (player_count-1)) * 8
+    p = Player(boards[b], s, i)
     Players.append(p)
 
   return Players

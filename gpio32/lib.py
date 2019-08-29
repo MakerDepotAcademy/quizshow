@@ -7,8 +7,7 @@ class Board():
   
   def __init__(self, port, qu=32, id=None):
     self._ser = serial.Serial(str(port), 2000000, timeout=1)
-    self._ser.flushInput()
-    self._ser.flushOutput()
+    self.flush()
     self._hooks = []
     self.queue = ['x'] * qu
     self._queuelen = qu
@@ -19,6 +18,10 @@ class Board():
 
   def close(self):
     self._ser.close()
+
+  def flush(self):
+    self._ser.flushInput()
+    self._ser.flushOutput()
 
   def _eventLoop(self):
     last = ''
@@ -127,13 +130,17 @@ class Board():
         else:
           return l
       raise Exception('Timeout')
-
-    
+   
     for p in pins:
-      self.setInput(p, False)
+      self.setInput(p, True)
     self.run()
 
     print(pins)
+    try:
+      while True:
+        readline(1)
+    except:
+      pass
 
     last = ''
     while not last:
