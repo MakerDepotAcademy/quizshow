@@ -10,7 +10,7 @@ class Question():
     self.id = kwargs['id']
     self.correct = kwargs['correct']
     self.answers = {}
-    for c in choices:
+    for c in CHOICES:
       self.answers[c] = kwargs[c]
 
   def checkAnswer(self, ans):
@@ -19,6 +19,10 @@ class Question():
 def getQuestions():
   dbConnect = create_engine(Database().URL)
   dbConnection = dbConnect.connect()
+  dbConnection.execute('''
+                        UPDATE go_time_trivia
+                        SET has_been_used = 0
+                        ''')
   query = dbConnection.execute('''SELECT
                                       g.rowid,
                                       g.QUESTION,
@@ -41,4 +45,4 @@ def getQuestions():
                         SET has_been_used = 1
                         WHERE rowid = %s;
                         ''' % r['rowid'])
-    yield Question(id=r['id'], red=r['red'], blue=r['blue'], green=r['green'], yellow=r['yellow'], correct=r['correct_answer'])
+    yield Question(id=r['rowid'], red=r['red'], blue=r['blue'], green=r['green'], yellow=r['yellow'], correct=r['correct_answer'], question=r['question'])
