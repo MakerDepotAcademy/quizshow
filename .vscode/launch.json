@@ -23,7 +23,7 @@
       "name": "Python: Quiz Show Game Play",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/QuizShowGamePlay.py",
+      "program": "${workspaceFolder}/quizshow.py",
       "console": "integratedTerminal"
     }
   ]
