@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request
 from threading import Thread
 
@@ -44,8 +46,7 @@ def gameLoop(pc):
 
     Pause.block_if_paused()
     ans = player.catchAnswer()
-
-    Pause.block_if_paused()
+    
     if question.checkAnswer(ans):
       disp.setCorrect(ans)
       Scores.score += Scores.Inc
@@ -55,8 +56,22 @@ def gameLoop(pc):
       Scores.score -= Scores.Dec
 
     disp.setScore(Scores.score)
+
+    Pause.block_if_paused()
     disp.flush()
 
+def gameTimeout():
+  # This will nuke threads too, thanks brad
+  i = Times.Game_Time
+  while i > 0:
+    Pause.block_if_paused()
+    time.sleep(1)
+    i -= 1
+    if i == 0:
+      os.kill(os.getpid(), signal.SIGUSR1)
+      return
+
+gameTimer = Thread(target=gameTimeout)
 
 app = Flask(__name__)
 
@@ -65,6 +80,7 @@ def flask_start_game():
   pc = request.form['playerCount']
   t = Thread(target=gameLoop, args=[int(pc)])
   t.start()
+  gameTimer.start()
   return 'started'
 
 @app.route('/pause')
