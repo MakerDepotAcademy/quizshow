@@ -1,4 +1,4 @@
-import os
+import os, time
 
 from flask import Flask, request
 from threading import Thread
@@ -90,5 +90,9 @@ def flask_pause_game():
     return 'Game is paused'
   else:
     return 'Game is running'
+
+@app.route('/score')
+def flask_get_score():
+  return str(Scores.score)
 
 app.run(host='0.0.0.0', port=5000)
