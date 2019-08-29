@@ -3,3 +3,4 @@ flask
 serial
 requests
 pathlib
+toml

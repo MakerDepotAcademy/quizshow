@@ -72,10 +72,11 @@ global _choices
 _choices = ['red', 'green', 'yellow', 'blue']
 class Player():
     
-    def __init__(self, board, bot):
+    def __init__(self, board, bot, id):
         global _choices
         self.buttons = { l: Button(board, i, i + 1) for l, i in zip( _choices, range(bot, bot + 8, 2) ) }
         self._board = board
+        self._id = id
 
     def lightAll(self, on=True):
         for b in self.buttons:
@@ -122,16 +123,11 @@ def AskQuestions(player_count):
     dbConnection = dbConnect.connect()
 
     boards_ = [Boards[int(i)] for i in C.BoardStack]
-    print(dir(boards_))
-    Players = {}
-    b = B = 0
-    for c in [chr(i) for i in range(97, 97 + player_count)]:
-        Players[c] = Player(boards_[B], (b * 8))
-        if b >= C.BoardPlayerLimit:
-            b = 0
-            B += 1
-        else:
-            b += 1
+    Players = []
+    abc = list([chr(i) for i in range(97, 97 + player_count + 1)])
+    for i in range(player_count):
+        p = Player(boards_[i // (player_count-1)], ((i % 5) * 8), abc[i])
+        Players.append(p)
                         
     while (1):
         # Ask question and verify answer
@@ -153,7 +149,7 @@ def AskQuestions(player_count):
         #result = {'trivia_question': [dict(zip(tuple(query.keys()), i))
         #                              for i in query.cursor]}
         
-        GP = cycle(Players.values()) 
+        GP = cycle(Players) 
         for row in query:
             q = dbConnection.execute('''
             UPDATE go_time_trivia

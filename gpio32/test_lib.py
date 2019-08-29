@@ -15,6 +15,7 @@ def forAllPins(fn):
       self.thisPin = i
       fn(self)
     self.thisBoard.run()
+    self.thisBoard.reset()
     self.assertTrue(True)
 
   return wrapper
@@ -46,34 +47,30 @@ class Lib_Test(unittest.TestCase):
 
   @forAllBoards
   @forAllPins
-  def test_setAllInputsInverse(self):
+  def test_setAllInputsPullup(self):
     self.thisBoard.setInput(self.thisPin, True)
 
+  @forAllBoards
   def test_getLocation(self):
-    for id in self.manager:
-      m = self.manager[id]
-      l = m.getLocation()
+      l = self.thisBoard.getLocation()
       self.assertTrue(l)
 
+  @forAllBoards
   def test_getPorts(self):
-    for id in self.manager:
-      m = self.manager[id]
-      l = m.getPorts()
+      l = self.thisBoard.getPorts()
       self.assertTrue(l)
 
+  @forAllBoards
   def test_getIDs(self):
-    for id in self.manager:
-      m = self.manager[id]
-      l = m.getID()
+      l = self.thisBoard.getID()
       self.assertTrue(l)
 
-  def test_interupts(self):
-    def hook(pin, val):
-      self.assertTrue(True)
-
-    for id in self.manager:
-      m = self.manager[id]
-      m.onChange(hook) 
+  @forAllBoards
+  @forAllPins
+  def test_awaitChange(self):
+    print('Please press ' + str(self.thisPin))
+    r = self.thisBoard.awaitChange([self.thisPin], 100)
+    self.assertEqual(r, self.thisPin)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ import re
 
 class Board():
   
-  def __init__(self, port, qu=32):
+  def __init__(self, port, qu=32, id=None):
     self._ser = serial.Serial(str(port), 2000000, timeout=1)
     self._ser.flushInput()
     self._ser.flushOutput()
@@ -15,6 +15,7 @@ class Board():
     self._eventThread = Thread(target=self._eventLoop)
     self._eventAlive = False
     self._eventLock = Lock()
+    self._id = id
 
   def close(self):
     self._ser.close()
@@ -42,8 +43,17 @@ class Board():
     self._ser.write(t.encode())
     self.queue = ['x'] * self._queuelen
 
+  def reset(self):
+    def r(c):
+      self.queue = c * 32
+      self.run()
+    r('U')
+    r('I')
+    r('0')
+    
+
   def _setpin(self, pin, val):
-    self.queue[pin - 1] = val
+    self.queue[pin] = val
 
   def _prompt(self, p):
     self.run()
@@ -120,7 +130,7 @@ class Board():
 
     
     for p in pins:
-      self.setInput(p)
+      self.setInput(p, True)
 
     self.run()
     last = ''
@@ -135,9 +145,8 @@ class Board():
       
       if m(l): 
         for p in pins:
-          p -= 1
           if l[p] != last[p]:
-            return p + 1
+            return p
 
         last = l
 

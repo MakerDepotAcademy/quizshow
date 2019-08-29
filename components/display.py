@@ -1,10 +1,7 @@
 import requests
 from json import dumps
 from socket import gethostname
-
-class DoNotUseMe(Exception):
-    def __init__(self):
-        print('DO NOT USE ME')
+from questions import CHOICES
 
 class Display():
 
@@ -18,8 +15,6 @@ class Display():
         return 'http://%s/%s' % (self._address, endpoint)
 
     def _post(self, endpoint, payload):
-        # print('%s, %s, %s' % (endpoint, payload, dumps(payload)))
-        # return requests.post(self._getEndpoint(endpoint), data=str(payload), headers={'Content-Type': 'application/x-www-form-urlencoded'})
         self._payload[endpoint] = payload
 
     def flush(self):
@@ -48,15 +43,6 @@ class Display():
     def setScore(self, score):
         self._post('score', score)
 
-    def addScore(self, add):
-        raise DoNotUseMe()
-
-    def subScore(self, sub):
-        raise DoNotUseMe()
-
-    def getScore(self):
-        raise DoNotUseMe()
-
     def start(self):
         self.isRunning = True
         requests.post(self._getEndpoint('start'))
@@ -71,7 +57,6 @@ class Display():
         self._post('wrong', '')
 
     def hook(self, event, me):
-        # rsp = requests.post(self._getEndpoint('subscribe/%s' % event), data='http://%s:5000/' % gethostname())
         self._post('subscribe', {
             'event': 'gameover',
             'uri': 'http://%s/' % me,
@@ -96,3 +81,10 @@ class Display():
 
     def restart(self):
         requests.post(self._getEndpoint('restart'), '')
+
+def displayQuestion(display, question):
+    display.setQuestion(question.question)
+    for c in CHOICES:
+        display.setAnswer(c, question.answers[c])
+
+    display.flush()
