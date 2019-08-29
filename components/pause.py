@@ -7,8 +7,8 @@ class Pause():
     self._hook = hook
 
   def block_if_paused(self):
-    PAUSE.acquire(True)
-    PAUSE.release()
+    self._lock.acquire(True)
+    self._lock.release()
 
   def pause(self):
     if self._lock.isLocked():
