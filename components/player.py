@@ -8,7 +8,7 @@ from gpio32.lib import Manager
 
 class Button():
 
-  def __init__(self, board, pin_in, pin_out):
+  def __init__(self, board, pin_out, pin_in):
     self._board = board
     self._in = pin_in
     self._out = pin_out
