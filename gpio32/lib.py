@@ -172,9 +172,11 @@ class Manager():
           i = b.getID()
           if re.search(r'[0-9]+', i):
             self._boards[int(i)] = b
+            print('Got board %s at %s' % (i, str(acm)))
             break
       except Exception as e:
         print(e)
+  
 
   def __getitem__(self, i):
     return self.getBoardByID(i)
