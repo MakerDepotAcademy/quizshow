@@ -19,8 +19,8 @@ const listener = (channel, query, action) => {
 const listenerAnswer = label => {
   let q = "#" + label + " #answer";
   listener(label, q);
-  listener(label + "-correct", q);
-  listener(label + "-selected", q, opts => {
+  listener(label + ".correct", q);
+  listener(label + ".selected", q, opts => {
     let t = document.querySelector(opts.query).innerText
     document.querySelector(opts.query).innerText = "** " + t + " **"
   })
