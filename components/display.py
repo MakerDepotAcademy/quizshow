@@ -1,7 +1,12 @@
-import requests
 from json import dumps
-from socket import gethostname
-from questions import CHOICES
+from components.questions import CHOICES
+import websocket
+
+
+class DONOTUSEME(Exception):
+
+    def __init__(self):
+        Exception.__init__("Do Not Use Me")
 
 class Display():
 
@@ -10,68 +15,49 @@ class Display():
         self._payload = dict()
         self.isPaused = False
         self.isRunning = False
+        self._ws = websocket.WebSocket()
+        self._ws.connect('ws://' + self._address)
 
     def _getEndpoint(self, endpoint):
-        return 'http://%s/%s' % (self._address, endpoint)
+        return endpoint
 
-    def _post(self, endpoint, payload):
+    def _queue(self, endpoint, payload):
         self._payload[endpoint] = payload
 
     def flush(self):
-        p = self._payload
-        print(p)
+        print(self._payload)
+        self._ws.send(dumps(self._payload))
         self._payload = dict()
-        return requests.post(self._getEndpoint(''), data=dumps(p), headers={'Content-Type': 'application/json'})
-
 
     def setQuestion(self, question):
-        self._post('question', question)
+        self._queue('question', question)
 
     def _getLabel(self, label, edge=None):
-        edge = '-' + edge if edge is not None else ''
-        return '%s%s' % (label, edge)
+        edge = '.' + edge if edge is not None else ''
+        return label + edge
 
     def setAnswer(self, label, answer):
-        self._post(self._getLabel(label), answer)
+        self._queue(self._getLabel(label), answer)
 
     def setCorrect(self, label):
-        self._post(self._getLabel(label, 'correct'), '')
+        self._queue(self._getLabel(label, 'correct'), '')
 
     def setSelected(self, label):
-        self._post(self._getLabel(label, 'selected'), '')
+        self._queue(self._getLabel(label, 'selected'), '')
 
     def setScore(self, score):
-        self._post('score', score)
-
-    def start(self):
-        self.isRunning = True
-        requests.post(self._getEndpoint('start'))
+        self._queue('score', score)
 
     def setRoundTimer(self, secs):
-        self._post('timer/round', secs)
+        self._queue('roundtick', secs)
+        self.flush()
     
     def setGameTimer(self, secs):
-        self._post('timer/game', secs)
+        self._queue('gametick', secs)
+        self.flush()
 
     def doWrong(self):
-        self._post('wrong', '')
-
-    def hook(self, event, me):
-        self._post('subscribe', {
-            'event': 'gameover',
-            'uri': 'http://%s/' % me,
-            'method': 'GET'
-        })
-
-    def restart(self):
-        requests.post(self._getEndpoint('restart'))
-
-    def close(self):
-        requests.delete(self._getEndpoint(''))
-
-    def pause(self):
-        self.isPaused = not self.isPaused
-        requests.post(self._getEndpoint('pause'))
+        self._queue('wrong', '')
 
     def playVideo(self, vidpath):
         requests.post(self._getEndpoint('videoplay'), vidpath)

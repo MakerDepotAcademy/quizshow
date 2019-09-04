@@ -1,6 +1,7 @@
 sqlalchemy
 flask
-serial
+pyserial
 requests
 pathlib
 toml
+websockets

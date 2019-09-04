@@ -2,11 +2,87 @@ import serial
 from pathlib import Path
 from threading import Thread, Lock
 import re
+from random import randint
+from time import sleep
+import components.settings as Settings
+
+DEV = True
+DEV_COUNT = 2
+DEV_BIDS = iter(Settings.BoardStack().Board_Stack)
+
+class DevSerial():
+  
+  def __init__(self, port, baudrate=2000000, timeout=1):
+    self._port = port
+    self._br = baudrate
+    self._timeout = timeout
+    self._status = ['x'] * 32
+    self._pins = ['0'] * 32
+    self._read_stack = []
+    self._id = next(DEV_BIDS)
+    self.closed = False
+
+  def write(self, d):
+    if self.closed:
+      raise Exception('Serial is closed')
+
+    d = list(d)
+    if len(d) == 33:
+      for i, c in enumerate(d):
+        self._status[i] = d[i] if c == 'x' else c 
+      return
+
+    if d[0] == '?':
+      self._read_stack.append(self._id)
+      return
+
+    if d[0] == 'l':
+      return
+
+    if d[0] == 'v':
+      self._read_stack.append('dev')
+
+    if d[0] == 'r':
+      self._read_stack.append(self._pins)
+      return
+
+    if d[0] == 'R':
+      self._read_stack.append(self._status)
+      return
+
+    if d[0] == 's':
+      self._status[d[1:-1]] = d[-1]
+      return
+
+  def readline(self):
+    if self._read_stack == []:
+      sleep(self._timeout)
+      return ''
+    else:
+      return str(self._read_stack.pop())
+
+  def close(self):
+    self.close = True
+
+  def flushInput(self):
+    pass
+
+  def flushOutput(self, ):
+    pass
+
+  def interrupt(self, pin, val=-1):
+    buff = self._status
+    buff[pin] = not buff[pin] if val == -1 else val
+    self._read_stack.append(buff)
+
 
 class Board():
   
   def __init__(self, port, qu=32, id=None):
-    self._ser = serial.Serial(str(port), 2000000, timeout=1)
+    if DEV:
+      self._ser = DevSerial(port)
+    else:
+      self._ser = serial.Serial(str(port), 2000000, timeout=1)
     self.flush()
     self._hooks = []
     self.queue = ['x'] * qu
@@ -117,7 +193,7 @@ class Board():
 
     self.run()
 
-  def awaitChange(self, pins, timeout):
+  def awaitChange(self, pins, timeout, timeout_tick=None):
     def m(l):
       return re.match(r'[01]', l)
 
@@ -127,6 +203,7 @@ class Board():
         l = self._ser.readline()
         if l == '':
           t -= 1
+          timeout_tick and timeout_tick(t)
         else:
           return l
       raise Exception('Timeout')
@@ -162,9 +239,14 @@ class Board():
 class Manager():
   
   def __init__(self):
-    # ls /dev/ttyACM*
     self._boards = {}
-    for acm in Path('/dev').glob('ttyACM*'):
+    l = None
+    if DEV:
+      l = range(len(Settings.BoardStack().Board_Stack))
+    else:
+      l = Path('/dev').glob('ttyACM*')
+    
+    for acm in l:
       b = None
       try:
         b = Board(acm)

@@ -19,12 +19,12 @@ disp.setRoundTimer(Times.Round_Time)
 disp.setGameTimer(Times.Game_Time)
 
 def hook_pause(isPaused):
-  if isPaused:
-    disp.pause()
-  else:
-    disp.start()
+  pass
 
 Pause = Pause(hook_pause)
+
+def round_tickdown(t):
+  disp.setRoundTimer(t)
 
 def gameLoop(pc):
   plyrs = Player.assignPlayers(pc)
@@ -41,13 +41,11 @@ def gameLoop(pc):
     question.show()
     displayQuestion(disp, question)
 
-    Pause.block_if_paused()
-    disp.start()
 
     Pause.block_if_paused()
     ans = player.catchAnswer()
     
-    if question.checkAnswer(ans):
+    if question == ans:
       disp.setCorrect(ans)
       Scores.score += Scores.Inc
     else:
@@ -67,6 +65,7 @@ def gameTimeout():
     Pause.block_if_paused()
     time.sleep(1)
     i -= 1
+    disp.setGameTimer(i)
     if i == 0:
       os.kill(os.getpid(), signal.SIGUSR1)
       return
