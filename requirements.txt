@@ -4,4 +4,4 @@ pyserial
 requests
 pathlib
 toml
-websockets
+websocket-client
