@@ -25,14 +25,14 @@ def hook_pause(isPaused):
 
 Pause = Pause(hook_pause)
 
-def round_tickdown(t):
-  disp.setRoundTimer(t)
-
 def gameLoop(pc):
   plyrs = Player.assignPlayers(pc)
   Q = Questions.getQuestions()
   P = Player.cyclePlayers(plyrs)
   while True:
+    def round_tickdown(i):
+      disp.setRoundTimer(i)
+
     question = next(Q)
     player = next(P)
 
@@ -45,20 +45,23 @@ def gameLoop(pc):
 
 
     Pause.block_if_paused()
-    ans = player.catchAnswer()
+    ans = player.catchAnswer(round_tickdown)
     
     if question == ans:
       disp.setCorrect(ans)
       Scores.score += Scores.Inc
     else:
       disp.doWrong()
-      disp.setSelected(ans)
+      if ans:
+        disp.setSelected(ans)
       Scores.score -= Scores.Dec
 
     disp.setScore(Scores.score)
 
     Pause.block_if_paused()
+    time.sleep(Times.Invite_Sleep)
     disp.flush()
+
 
 def gameTimeout():
   # This will nuke threads too, thanks brad

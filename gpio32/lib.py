@@ -6,7 +6,7 @@ from random import randint
 from time import sleep
 import components.settings as Settings
 
-DEV = True
+DEV = False
 DEV_COUNT = 2
 DEV_BIDS = iter(Settings.BoardStack().Board_Stack)
 
@@ -137,7 +137,7 @@ class Board():
   def _prompt(self, p):
     self.run()
     self._eventLock.acquire(True)
-    self._ser.write(p)
+    self._ser.write(p.encode())
     r = self._ser.readline().decode()
     self._eventLock.release()
     return r.strip()
@@ -195,18 +195,19 @@ class Board():
 
   def awaitChange(self, pins, timeout, timeout_tick=None):
     def m(l):
-      return re.match(r'[01]', l)
+      return re.match(r'[01]', l.decode())
 
     def readline(t=timeout):
       l = ''
       while t > 0:
         l = self._ser.readline()
-        if l == '':
+        if l == b'':
           t -= 1
-          timeout_tick and timeout_tick(t)
+          if timeout_tick:
+            timeout_tick(t)
         else:
           return l
-      raise Exception('Timeout')
+      raise TimeoutError()
    
     for p in pins:
       self.setInput(p, True)
@@ -216,8 +217,10 @@ class Board():
     try:
       while True:
         readline(1)
-    except:
+    except TimeoutError:
       pass
+    except Exception as e:
+      print(e)
 
     last = ''
     while not last:

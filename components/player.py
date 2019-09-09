@@ -61,7 +61,7 @@ class Player():
         
     try:
       ret = self._board.awaitChange(b(), Time().Round_Time, timeout_tick)
-    except:
+    except TimeoutError as e:
       return ''
 
     for i in range(3):
@@ -74,10 +74,12 @@ def assignPlayers(player_count):
   manager = Manager()
   boards = [manager[i] for i in Settings.Board_Stack]
   Players = []
+  b = 0
+  S = cycle(range(0, 32, 8))
 
   for i in range(player_count):
-    b = i // (player_count-1)
-    s = (i % (player_count-1)) * 8
+    b += len(Players) > Settings.Board_Player_Limit
+    s = next(S)
     p = Player(boards[b], s, i)
     Players.append(p)
 
