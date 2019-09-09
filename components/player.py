@@ -1,6 +1,7 @@
 from time import sleep
-
+from random import shuffle
 from itertools import cycle
+
 from components.questions import CHOICES
 from components.settings import BoardStack, Time
 from gpio32.lib import Manager
@@ -86,4 +87,8 @@ def assignPlayers(player_count):
   return Players
 
 def cyclePlayers(players):
-  return cycle(players)
+  while True:
+    p = players
+    shuffle(p)
+    for i in p:
+      yield i
