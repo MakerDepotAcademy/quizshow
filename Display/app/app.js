@@ -35,13 +35,13 @@ const listenerAnswer = label => {
   })
 };
 
-const listenflash = label => {
+const listenflash = (label, timeout=2000) => {
   ipcRenderer.on(label, (evt, arg) => {
     var e = document.querySelector('#' + label)
     e.classList.remove('hidden')
     setTimeout(() => {
       e.classList.add('hidden')
-    }, 2000);
+    }, timeout);
   });
 }
 
@@ -54,9 +54,9 @@ listener('score', '#score');
 listener('roundtick', '#round_time');
 listener('gametick', '#game_time');
 listenflash('roundsup')
-listenflash('gameover')
+listenflash('gameover', 10000)
 listenflash('wrong')
-listenflash('player')
+listenflash('player', 3000)
 
 listener('player', '#player', opts => {
   var e = document.querySelector('#playername')
