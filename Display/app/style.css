@@ -107,10 +107,6 @@ header > .right {
   margin-right: 10vw;
 }
 
-header .right h3 {
-  color: black !important;
-}
-
 header > .left {
   margin-right: 4vw;
   margin-left: 10vw;
@@ -119,7 +115,7 @@ header > .left {
 * {
   font-family: sans-serif;
   text-align: center;
-  color: black;
+  /* color: black; */
 }
 
 body{
