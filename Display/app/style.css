@@ -71,10 +71,6 @@ h1#question {
   display: none;
 }
 
-h1.alert {
-  font-size: 
-}
-
 .alert {
   color: white;
 }
@@ -105,10 +101,14 @@ header {
 
 header > .right {
   border: 2px solid greenyellow;
-  background-color: white !important;
+  /* background-color: white !important; */
   padding: 5px;
   margin-top: 5vh;
   margin-right: 10vw;
+}
+
+header .right h3 {
+  color: black !important;
 }
 
 header > .left {
@@ -119,7 +119,7 @@ header > .left {
 * {
   font-family: sans-serif;
   text-align: center;
-  /* color: black; */
+  color: black;
 }
 
 body{
