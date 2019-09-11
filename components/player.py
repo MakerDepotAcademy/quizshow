@@ -87,9 +87,9 @@ def assignPlayers(player_count):
   return Players
 
 def cyclePlayers(players):
-  return cycle(players)
-  # while True:
-  #   p = players
-  #   shuffle(p)
-  #   for i in p:
-  #     yield i
+  # return cycle(players)
+  while True:
+    p = players
+    shuffle(p)
+    for i in p:
+      yield i
