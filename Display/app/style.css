@@ -1,3 +1,7 @@
+html {
+  cursor: none;
+}
+
 .container {
   margin: 20px auto;
   width: 100%;

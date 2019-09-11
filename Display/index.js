@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, powerSaveBlocker } = require('electron')
 const fs = require('fs')
 const WebSocket = require('ws');
 
@@ -50,9 +50,12 @@ app.on('ready', () => {
     webSecurity: false
   })
   win.maximize()
+  win.setFullScreen(true)
   win.loadFile('app/index.html')
+  const id = powerSaveBlocker.start('prevent-display-sleep')
   win.on('closed', () => {
     win = null
+    powerSaveBlocker.stop(id)
   })
 })
 
