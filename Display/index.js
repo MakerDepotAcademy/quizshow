@@ -1,11 +1,10 @@
 require('dotenv').config()
 
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const fs = require('fs')
 const WebSocket = require('ws');
 
 var win
-var score = 0, roundTicksLimit = roundTicks = -1, gameTicksLimit = gameTicks = -1, roundTicker, gameTicker
 
 function updateUI(channel, msg, ws) {
   if (win) {
@@ -26,7 +25,7 @@ function updateUI(channel, msg, ws) {
 const wss = new WebSocket.Server({
   port: 8080,
   host: '0.0.0.0'
-}, () => console.log('Listening...'));
+}, () => console.log('Listening on port 8080...'));
 
 wss.on('connection', ws => {
   console.log('Connected')

@@ -26,10 +26,11 @@ class DevSerial():
     if self.closed:
       raise Exception('Serial is closed')
 
-    d = list(d)
-    if len(d) == 33:
-      for i, c in enumerate(d):
-        self._status[i] = d[i] if c == 'x' else c 
+    d = [chr(i) for i in d]
+    if len(d) >= 32:
+      for i in range(32):
+        if d[i] != 'x':
+          self._status[i] = d[i]
       return
 
     if d[0] == '?':
@@ -59,7 +60,7 @@ class DevSerial():
       sleep(self._timeout)
       return ''
     else:
-      return str(self._read_stack.pop())
+      return str(self._read_stack.pop()).encode()
 
   def close(self):
     self.close = True
