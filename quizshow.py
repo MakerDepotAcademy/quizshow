@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, time
+import os, time, signal
 
 from flask import Flask, request
 from threading import Thread
@@ -80,7 +80,7 @@ def gameTimeout():
     i -= 1
     disp.setGameTimer(i)
     if i == 0:
-      os.kill(os.getpid(), signal.SIGUSR1)
+      os.kill(os.getpid(), signal.SIGQUIT)
       return
 
 gameTimer = Thread(target=gameTimeout)
