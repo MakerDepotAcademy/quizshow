@@ -4,7 +4,7 @@ const listener = (channel, query, action) => {
   ipcRenderer.on(channel, (evt, arg) => {
     console.log(channel, arg)
     if (!action) {
-      document.querySelector(query).innerText = arg;
+      document.querySelector(query).textContent = arg;
     }
     else {
       action({
