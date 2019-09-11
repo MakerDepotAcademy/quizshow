@@ -26,6 +26,7 @@ def hook_pause(isPaused):
 Pause = Pause(hook_pause)
 
 def gameLoop(pc):
+  # Pregame prep
   plyrs = Player.assignPlayers(pc)
   Q = Questions.getQuestions()
   P = Player.cyclePlayers(plyrs)
@@ -33,17 +34,22 @@ def gameLoop(pc):
     def round_tickdown(i):
       disp.setRoundTimer(i)
 
+    # Match player to question
     question = next(Q)
     player = next(P)
 
+    # Step 1: invite player
     Pause.block_if_paused()
-    player.flash(Times.Invite_Sleep)
+    # player.flash(Times.Invite_Sleep)
+    player.lightAll(True)
+    disp.invitePlayer(player._id)
 
+    # Step 2: Display question
     Pause.block_if_paused()
     question.show()
     displayQuestion(disp, question)
 
-
+    # Step 3: Judge answer
     Pause.block_if_paused()
     ans = player.catchAnswer(round_tickdown)
     
@@ -58,7 +64,9 @@ def gameLoop(pc):
 
     disp.setScore(Scores.score)
 
+    # Step 4 disinvite player
     Pause.block_if_paused()
+    player.lightAll(False)
     time.sleep(Times.Invite_Sleep)
     disp.flush()
 

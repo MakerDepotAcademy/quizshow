@@ -60,13 +60,21 @@ class Display():
         self._queue('wrong', '')
 
     def playVideo(self, vidpath):
-        requests.post(self._getEndpoint('videoplay'), vidpath)
+        self._queue('videoplay', vidpath)
+        self.flush()
 
     def playAudio(self, audpath):
-        requests.post(self._getEndpoint('audioplay'), audpath)
+        self._queue('audioplay', audpath)
+        self.flush()
 
     def restart(self):
-        requests.post(self._getEndpoint('restart'), '')
+        self._queue('restart', '')
+        self.flush()
+        
+    def invitePlayer(self, label):
+        self._queue('player', label)
+        self.flush()
+    
 
 def displayQuestion(display, question):
     display.setQuestion(question.question)

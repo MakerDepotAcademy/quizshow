@@ -2,7 +2,7 @@ const { ipcRenderer } = require("electron");
 
 const listener = (channel, query, action) => {
   ipcRenderer.on(channel, (evt, arg) => {
-    console.log([channel, arg])
+    console.log(channel, arg)
     if (!action) {
       document.querySelector(query).innerText = arg;
     }
@@ -19,38 +19,49 @@ const listener = (channel, query, action) => {
 const listenerAnswer = label => {
   let q = "#" + label + " #answer";
   listener(label, q);
-  listener(label + ".correct", q);
+  listener(label + ".correct", q, opts => {
+    var c = document.querySelector('#correct')
+    var e = document.querySelector(opts.query)
+    c.classList.remove('hidden')
+    e.innerText = '((' + e.innerText + '))'
+    setTimeout(() => {
+      c.classList.add('hidden')
+    }, 1500);
+  });
+
   listener(label + ".selected", q, opts => {
-    let t = document.querySelector(opts.query).innerText
-    document.querySelector(opts.query).innerText = "** " + t + " **"
+    var e = document.querySelector(opts.query)
+    e.innerText = "** " + e.innerText + " **"
   })
 };
 
-listener("question", "#question");
-listenerAnswer("red");
-listenerAnswer("green");
-listenerAnswer("blue");
-listenerAnswer("yellow");
-listener("score", "#score");
-listener("roundtick", "#round_time");
-listener("gametick", "#game_time");
+const listenflash = label => {
+  ipcRenderer.on(label, (evt, arg) => {
+    var e = document.querySelector('#' + label)
+    e.classList.remove('hidden')
+    setTimeout(() => {
+      e.classList.add('hidden')
+    }, 2000);
+  });
+}
 
-ipcRenderer.on("roundsup", (evt, arg) => {
-  let el = document.querySelector("#roundsup");
-  el.classList.remove("hidden");
-  setTimeout(() => el.classList.add("hidden"), 2000);
-});
+listener('question', '#question');
+listenerAnswer('red');
+listenerAnswer('green');
+listenerAnswer('blue');
+listenerAnswer('yellow');
+listener('score', '#score');
+listener('roundtick', '#round_time');
+listener('gametick', '#game_time');
+listenflash('roundsup')
+listenflash('gameover')
+listenflash('wrong')
+listenflash('player')
 
-ipcRenderer.on("gameover", (evt, arg) => {
-  document.querySelector("#gameover").classList.remove("hidden");
-});
-
-ipcRenderer.on("wrong", (evt, arg) => {
-  let el = document.querySelector("#wrong");
-  el.classList.remove("hidden");
-  setTimeout(() => el.classList.add("hidden"), 1500);
+listener('player', '#player', opts => {
+  var e = document.querySelector('#playername')
+  e.innerText = opts.arg
 })
-
 
 var vid = document.querySelector('video')
 vid.addEventListener('ended', () => {
