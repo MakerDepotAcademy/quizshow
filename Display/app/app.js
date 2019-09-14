@@ -57,6 +57,7 @@ listenflash('roundsup')
 listenflash('gameover', 10000)
 listenflash('wrong')
 listenflash('player', 3000)
+listenflash('timeout', 1000)
 
 listener('player', '#player', opts => {
   var e = document.querySelector('#playername')

@@ -53,22 +53,25 @@ def gameLoop(pc):
     Pause.block_if_paused()
     ans = player.catchAnswer(round_tickdown)
     
-    if question == ans:
-      disp.setCorrect(ans)
-      Scores.score += Scores.Inc
+    if ans == '':
+      disp.timeout()
     else:
-      disp.doWrong()
-      if ans:
-        disp.setSelected(ans)
-      Scores.score -= Scores.Dec
+      if question == ans:
+        disp.setCorrect(ans)
+        Scores.score += Scores.Inc
+      else:
+        disp.doWrong()
+        if ans:
+          disp.setSelected(ans)
+        Scores.score -= Scores.Dec
 
     disp.setScore(Scores.score)
 
     # Step 4 disinvite player
     Pause.block_if_paused()
+    disp.flush()
     player.lightAll(False)
     time.sleep(Times.Invite_Sleep)
-    disp.flush()
 
 
 def gameTimeout():

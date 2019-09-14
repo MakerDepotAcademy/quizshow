@@ -18,10 +18,7 @@ class Display():
         self._ws = websocket.WebSocket()
         self._ws.connect('ws://' + self._address)
 
-    def _getEndpoint(self, endpoint):
-        return endpoint
-
-    def _queue(self, endpoint, payload):
+    def _queue(self, endpoint, payload=None):
         self._payload[endpoint] = payload
 
     def flush(self):
@@ -40,10 +37,10 @@ class Display():
         self._queue(self._getLabel(label), answer)
 
     def setCorrect(self, label):
-        self._queue(self._getLabel(label, 'correct'), '')
+        self._queue(self._getLabel(label, 'correct'))
 
     def setSelected(self, label):
-        self._queue(self._getLabel(label, 'selected'), '')
+        self._queue(self._getLabel(label, 'selected'))
 
     def setScore(self, score):
         self._queue('score', score)
@@ -57,7 +54,7 @@ class Display():
         self.flush()
 
     def doWrong(self):
-        self._queue('wrong', '')
+        self._queue('wrong')
 
     def playVideo(self, vidpath):
         self._queue('videoplay', vidpath)
@@ -68,12 +65,15 @@ class Display():
         self.flush()
 
     def restart(self):
-        self._queue('restart', '')
+        self._queue('restart')
         self.flush()
         
     def invitePlayer(self, label):
         self._queue('player', label)
         self.flush()
+
+    def timeout(self):
+        self._queue('timeout')
     
 
 def displayQuestion(display, question):
