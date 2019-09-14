@@ -4,8 +4,9 @@ from itertools import cycle
 
 from components.questions import CHOICES
 from components.settings import BoardStack, Time
-from gpio32.lib import Manager
+from gpio32.lib import Manager as M
 
+Manager = M()
 
 class Button():
 
@@ -72,8 +73,7 @@ class Player():
 
 def assignPlayers(player_count):
   Settings = BoardStack()
-  manager = Manager()
-  boards = [manager[i] for i in Settings.Board_Stack]
+  boards = [Manager[i] for i in Settings.Board_Stack]
   Players = []
   b = 0
   S = cycle(range(0, 32, 8))

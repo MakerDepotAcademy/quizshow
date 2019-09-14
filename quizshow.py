@@ -83,6 +83,9 @@ def gameTimeout():
     i -= 1
     disp.setGameTimer(i)
     if i == 0:
+      for b in Player.Manager:
+        b.reset()
+      Player.Manager.closeall()
       os.kill(os.getpid(), signal.SIGQUIT)
       return
 
