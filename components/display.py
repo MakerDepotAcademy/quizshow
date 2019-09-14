@@ -37,13 +37,23 @@ class Display():
         self._queue(self._getLabel(label), answer)
 
     def setCorrect(self, label):
+        self._queue(self._getLabel('score', 'correct'))
         self._queue(self._getLabel(label, 'correct'))
 
     def setSelected(self, label):
         self._queue(self._getLabel(label, 'selected'))
 
     def setScore(self, score):
-        self._queue('score', score)
+        pass
+        # # self._queue('score', score)
+        # def l(s):
+        #     return self._getLabel('score', s)
+
+        # if score > 0:
+        #     self._queue(l('correct'))
+        
+        # if score < 0:
+        #     self._queue(l('wrong'))
 
     def setRoundTimer(self, secs):
         self._queue('roundtick', secs)
@@ -54,6 +64,7 @@ class Display():
         self.flush()
 
     def doWrong(self):
+        self._queue(self._getLabel('score', 'wrong'))
         self._queue('wrong')
 
     def playVideo(self, vidpath):

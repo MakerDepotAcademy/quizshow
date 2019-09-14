@@ -50,7 +50,6 @@ listenerAnswer('red');
 listenerAnswer('green');
 listenerAnswer('blue');
 listenerAnswer('yellow');
-listener('score', '#score');
 listener('roundtick', '#round_time');
 listener('gametick', '#game_time');
 listenflash('roundsup')
@@ -58,6 +57,15 @@ listenflash('gameover', 10000)
 listenflash('wrong')
 listenflash('player', 3000)
 listenflash('timeout', 1000)
+
+listener('score.correct', '#score.correct', (opts) => {
+  let e = document.querySelector(opts.query)
+  e.textContent = parseInt(e.textContent) + 1
+});
+listener('score.wrong', '#score.wrong', (opts) => {
+  let e = document.querySelector(opts.query)
+  e.textContent = parseInt(e.textContent) - 1
+})
 
 listener('player', '#player', opts => {
   var e = document.querySelector('#playername')
