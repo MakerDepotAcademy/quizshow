@@ -37,28 +37,8 @@ html {
   background-color: rgba(255, 255, 0, var(--opacity));
 }
 
-.left, .right {
-  display: block;
-}
-
-.right {
-  float: right;
-  justify-content: right;
-}
-
-.left {
-  float: left;
-  justify-content: left;
-}
-
 h1 {
   font-size: 10vh;
-}
-
-header > .left {
-  background: -webkit-linear-gradient(45deg, rgb(9, 0, 159), rgb(0, 255, 149) 80%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 h1#question {
@@ -104,17 +84,10 @@ header {
   display: inline-block;
 }
 
-header > .right {
-  border: 2px solid greenyellow;
-  /* background-color: white !important; */
-  padding: 5px;
-  margin-top: 5vh;
-  margin-right: 10vw;
-}
-
-header > .left {
-  margin-right: 4vw;
-  margin-left: 10vw;
+header h1 {
+  background: -webkit-linear-gradient(45deg, rgb(9, 0, 159), rgb(0, 255, 149) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 * {
@@ -127,4 +100,12 @@ body{
   background-image: url('background.png');
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+#stats {
+  border: 2px solid greenyellow;
+  text-align: left !important;
+  max-width:14em;
+  width:12em;
+  position: absolute;
 }
