@@ -12,45 +12,56 @@ class Section():
   def show(self):
     print(self._section)
 
+  def _get(self, key, default=None):
+    try:
+      return self._section[key]
+    except KeyError as e:
+      if default is None:
+        raise e
+      else:
+        return default
+
+  def _getint(self, key, default=None):
+    return int(self._get(key, default))
+
 
 class Time(Section):
 
   def __init__(self):
     Section.__init__(self, 'TIME')
-    self.Game_Time = int(self._section['GAME_TIME'])
-    self.Round_Time = int(self._section['ROUND_TIME'])
-    self.Invite_Sleep = int(self._section['INVITE_SLEEP'])
+    self.Game_Time = self._getint('GAME_TIME')
+    self.Round_Time = self._getint('ROUND_TIME')
+    self.Invite_Sleep = self._getint('INVITE_SLEEP', 1)
 
 
 class BoardStack(Section):
 
   def __init__(self):
     Section.__init__(self, 'BOARDS')
-    self.Board_Stack = [int(i) for i in self._section['BOARD_STACK'].split(',')]
-    self.Board_Player_Limit = self._section['BOARD_PLAYER_LIMIT']
+    self.Board_Stack = [int(i) for i in self._get('BOARD_STACK').split(',')]
+    self.Board_Player_Limit = self._get('BOARD_PLAYER_LIMIT', 4)
 
 
 class Scores(Section):
 
   def __init__(self):
     Section.__init__(self, 'SCORES')
-    self.Inc = int(self._section['INC'])
-    self.Dec = int(self._section['DEC'])
-    self.Init_Score = int(self._section['INIT'])
+    self.Inc = self._getint('INC', 1)
+    self.Dec = self._getint('DEC', 1)
+    self.Init_Score = self._getint('INIT', 0)
 
 
 class Database(Section):
 
   def __init__(self):
     Section.__init__(self, 'DATABASE')
-    self.URL = self._section['URL']
+    self.URL = self._get('URL')
 
 
 class Links(Section):
 
   def __init__(self):
     Section.__init__(self, 'LINKS')
-    self.Display_Host = self._section['DISP']
-    self.Me = self._section['ME']
-    self.Preamble_Video = self._section['PREAMBLE_VID']
-    self.Sounds = self._section['AUDIO_FOLDER']
+    self.Display_Host = self._get('DISP')
+    self.Me = self._get('ME', 'localhost:5000')
+
