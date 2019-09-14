@@ -78,20 +78,9 @@ vid.addEventListener('ended', () => {
   ipcRenderer.send('videodone')
 })
 
-var aud = document.querySelector('audio')
-aud.addEventListener('ended', () => {
-  ipcRenderer.send('audiodone')
-})
-
 ipcRenderer.on("videoplay", (evt, arg) => {
   vid.src = arg
   vid.classList.remove('hidden')
   vid.load()
   vid.play()
-})
-
-ipcRenderer.on("audioplay", (evt, arg) => {
-  aud.src = arg
-  aud.load()
-  aud.play()
 })

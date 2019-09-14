@@ -14,6 +14,7 @@ from components.pause import Pause
 Times = Settings.Time()
 Links = Settings.Links()
 Scores = Settings.Scores()
+Music = Settings.Music()
 Scores.score = Scores.Init_Score
 
 disp = Display(Links.Display_Host)
@@ -22,11 +23,20 @@ disp.setGameTimer(Times.Game_Time)
 
 def hook_pause(isPaused):
   pass
-
 Pause = Pause(hook_pause)
+
+def ambientAudioEnforcer():
+  while True:
+    disp.playAudio(Music.Ambient)
+    sleep(Times.AmbientDelay)
+ambinetAudioThread = Thread(target=ambientAudioEnforcer)
 
 def gameLoop(pc):
   # Pregame prep
+  disp.playAudio(Music.Start)
+  sleep(Times.StartDelay)
+
+  ambinetAudioThread.start()
   plyrs = Player.assignPlayers(pc)
   Q = Questions.getQuestions()
   P = Player.cyclePlayers(plyrs)
@@ -43,6 +53,7 @@ def gameLoop(pc):
     # player.flash(Times.Invite_Sleep)
     player.lightAll(True)
     disp.invitePlayer(player._id)
+    disp.playAudio(Music.Start)
 
     # Step 2: Display question
     Pause.block_if_paused()
@@ -55,14 +66,14 @@ def gameLoop(pc):
     
     if ans == '':
       disp.timeout()
+      disp.playAudio(Music.Wrong)
     else:
       if question == ans:
         disp.setCorrect(ans)
         Scores.score += Scores.Inc
       else:
         disp.doWrong()
-        if ans:
-          disp.setSelected(ans)
+        disp.setSelected(ans)
         Scores.score -= Scores.Dec
 
     disp.setScore(Scores.score)
@@ -82,13 +93,17 @@ def gameTimeout():
     time.sleep(1)
     i -= 1
     disp.setGameTimer(i)
+
+    if i == Music.WarningTime:
+      disp.playAudio(Music.Warning)
+
     if i == 0:
+      disp.playAudio(Music.End)
       for b in Player.Manager:
         b.reset()
       Player.Manager.closeall()
       os.kill(os.getpid(), signal.SIGQUIT)
       return
-
 gameTimer = Thread(target=gameTimeout)
 
 app = Flask(__name__)
@@ -99,6 +114,7 @@ def flask_start_game():
   t = Thread(target=gameLoop, args=[int(pc)])
   t.start()
   gameTimer.start()
+  ambinetAudioThread.start()
   return 'started'
 
 @app.route('/pause')

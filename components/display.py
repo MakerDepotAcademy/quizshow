@@ -1,7 +1,9 @@
 from json import dumps
 from components.questions import CHOICES
+from components.settings import Music
 import websocket
 
+M = Music()
 
 class DONOTUSEME(Exception):
 
@@ -39,21 +41,13 @@ class Display():
     def setCorrect(self, label):
         self._queue(self._getLabel('score', 'correct'))
         self._queue(self._getLabel(label, 'correct'))
+        self.playAudio(M.Correct)
 
     def setSelected(self, label):
         self._queue(self._getLabel(label, 'selected'))
 
     def setScore(self, score):
         pass
-        # # self._queue('score', score)
-        # def l(s):
-        #     return self._getLabel('score', s)
-
-        # if score > 0:
-        #     self._queue(l('correct'))
-        
-        # if score < 0:
-        #     self._queue(l('wrong'))
 
     def setRoundTimer(self, secs):
         self._queue('roundtick', secs)
@@ -66,6 +60,7 @@ class Display():
     def doWrong(self):
         self._queue(self._getLabel('score', 'wrong'))
         self._queue('wrong')
+        self.playAudio(M.Wrong)
 
     def playVideo(self, vidpath):
         self._queue('videoplay', vidpath)

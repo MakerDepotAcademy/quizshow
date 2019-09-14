@@ -3,6 +3,8 @@ require('dotenv').config()
 const { app, BrowserWindow, powerSaveBlocker } = require('electron')
 const fs = require('fs')
 const WebSocket = require('ws');
+var player = require('play-sound')(opts = {})
+
 
 var win
 
@@ -33,6 +35,13 @@ wss.on('connection', ws => {
     console.log(msg)
     msg = JSON.parse(msg)
     for (let key in msg) {
+      if (key == 'audioplay'){
+        console.log('Playing ', msg[key])
+        player.play(msg[key], { timeout: 300 }, function(err){
+          if (err) throw err
+        })
+        continue
+      }
       updateUI(key, msg[key], ws)
     }
   })

@@ -32,6 +32,9 @@ class Time(Section):
     self.Game_Time = self._getint('GAME_TIME')
     self.Round_Time = self._getint('ROUND_TIME')
     self.Invite_Sleep = self._getint('INVITE_SLEEP', 1)
+    self.StartDelay = self._getint('START_DELAY')
+    self.AmbientDelay = self._getint('AMBIENT_DELAY')
+    self.WarningTime = self._getint('WARNING_TIME', 15)
 
 
 class BoardStack(Section):
@@ -65,3 +68,13 @@ class Links(Section):
     self.Display_Host = self._get('DISP')
     self.Me = self._get('ME', 'localhost:5000')
 
+class Music(Section):
+
+  def __init__(self)
+    Section.__init__(self, 'MUSIC')
+    self.Start = self._get('START')
+    self.Ambient = self._get('AMBIENT')
+    self.Warning = self._get('WARNING')
+    self.Correct = self._get('CORRECT')
+    self.End = self._get('END')
+    self.Wrong = self._get('WRONG')
