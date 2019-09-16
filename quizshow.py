@@ -36,7 +36,6 @@ def gameLoop(pc):
   disp.playAudio(Music.Start)
   sleep(Times.StartDelay)
 
-  ambinetAudioThread.start()
   plyrs = Player.assignPlayers(pc)
   Q = Questions.getQuestions()
   P = Player.cyclePlayers(plyrs)

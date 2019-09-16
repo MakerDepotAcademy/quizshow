@@ -68,7 +68,7 @@ class DevSerial():
   def flushInput(self):
     pass
 
-  def flushOutput(self, ):
+  def flushOutput(self):
     pass
 
   def interrupt(self, pin, val=-1):
@@ -220,8 +220,6 @@ class Board():
         readline(1)
     except TimeoutError:
       pass
-    except Exception as e:
-      print(e)
 
     last = ''
     while not last:
@@ -251,17 +249,13 @@ class Manager():
       l = Path('/dev').glob('ttyACM*')
     
     for acm in l:
-      b = None
-      try:
-        b = Board(acm)
-        for a in range(5): # For 5 attempts
-          i = b.getID()
-          if re.search(r'[0-9]+', i):
-            self._boards[int(i)] = b
-            print('Got board %s at %s' % (i, str(acm)))
-            break
-      except Exception as e:
-        print(e)
+      b = Board(acm)
+      for a in range(5): # For 5 attempts
+        i = b.getID()
+        if re.search(r'[0-9]+', i):
+          self._boards[int(i)] = b
+          print('Got board %s at %s' % (i, str(acm)))
+          break
   
 
   def __getitem__(self, i):

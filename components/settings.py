@@ -70,7 +70,7 @@ class Links(Section):
 
 class Music(Section):
 
-  def __init__(self)
+  def __init__(self):
     Section.__init__(self, 'MUSIC')
     self.Start = self._get('START')
     self.Ambient = self._get('AMBIENT')
