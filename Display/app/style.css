@@ -93,11 +93,12 @@ header h1 {
 * {
   font-family: sans-serif;
   text-align: center;
-  /* color: black; */
+  color: white;
 }
 
 body{
-  background-image: url('background.png');
+  /* background-image: url('background.png'); */
+  background-color: #000000;
   background-repeat: no-repeat;
   background-size: cover;
 }
