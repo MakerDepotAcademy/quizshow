@@ -2,41 +2,53 @@
 
 This is a quizshow
 
+- [quizshow](#quizshow)
+  - [Setup](#setup)
+  - [Config file](#config-file)
+  - [Usage](#usage)
+    - [QuizShowGamePlay.py](#quizshowgameplaypy)
+    - [Display](#display)
+
 ## Setup
 
 1. `pip3 install -r requirements.txt`
-2. `cd ETest && npm i`
+2. `cd Display && npm i`
 
 ## Config file
 
-Paste this into `config.cfg`
+Paste this into `./config.cfg`
 
 ```conf
-[DEFAULT]
-# How long each round is
+[TIME]
+GAME_TIME=3
 ROUND_TIME=10
-# How long the game is
-GAME_TIME=60
-# The ID of each board to populate with players
-BOARD_STACK=65535
-# Max numeber of players per board
-BOARD_PLAYER_LIMIT=3
-# How much to increment the score
-INC_SCORE=1
-# How much to decrement the score
-DEC_SCORE=1
-# Initial score
-INIT_SCORE=0
-# Database address
-DB_URL=sqlite:///quizShow.db
-# How long to flash the button lights when inviting a player
-INVITE_SLEEP=3
-# The hostname for the display
-DISP_HOST=localhost:8080
-# My hostname
-ME_HOST=localhost:5000
-# Video library
-PREAMBLE_VID=./video/start.vid
+INVITE_SLEEP=1
+
+[BOARDS]
+BOARD_STACK="10"
+BOARD_PLAYER_LIMIT=4
+
+[SCORES]
+INC=1
+DEC=1
+INIT=0
+
+[DATABASE]
+URL="sqlite:///quizShow.db"
+
+[LINKS]
+DISP="localhost:8080"
+ME="localhost:5000"
+PREAMBLE_VID="./video.mp4"
+AUDIO_FOLDER="./audio"
+
+[MUSIC]
+START=""
+AMBIENT=""
+WARNING=""
+CORRECT=""
+END=""
+WRONG=""
 ```
 
 ## Usage
@@ -48,8 +60,8 @@ There are no CLI args
 Api:
 
 ```bash
-curl host.domain/ -X POST -d 'playerCount=#' # Starts a game
-curl host.domain/dump -X GET # Returns all the settings and stats for the game
+curl host.domain/start -X POST -d 'playerCount=#' # Starts a game
+curl host.domain/score -X GET # Returns score
 curl host.domain/pause -X GET # Pauses/unpauses the game
 ```
 
