@@ -32,7 +32,12 @@ class Question():
 def getQuestions():
   dbConnect = create_engine(Database().URL)
   dbConnection = dbConnect.connect()
-  dbConnection.execute('UPDATE go_time_trivia SET has_been_used = 0')
+
+  # If the number of rows marked used is greater than or equal to the number of rows avaliable, then reset all the rows
+  if dbConnection.execute('SELECT COUNT(has_been_used) FROM go_time_trivia WHERE has_been_used=1').scalar() >= dbConnection.execute('SELECT COUNT(*) FROM go_time_trivia;').scalar():
+    print('Resetting database...')
+    dbConnection.execute('UPDATE go_time_trivia SET has_been_used = 0')
+
   query = dbConnection.execute('SELECT g.rowid, g.QUESTION, g.yellow, g.green, g.red, g.blue, g.correct_answer FROM go_time_trivia AS g WHERE g.has_been_used = 0 ORDER BY RANDOM() ASC')
 
   for r in query:
